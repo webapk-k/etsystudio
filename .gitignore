@@ -1,0 +1,6 @@
+config.php
+api/lib/cacert.pem
+*.log
+.DS_Store
+Thumbs.db
+data/

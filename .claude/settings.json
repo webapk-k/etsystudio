@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"/c/xampp/php/php.exe\" -l api/tool.php)",
+      "Bash(curl -s -m 45 -X POST http://localhost:8123/api/tool.php -H \"Content-Type: application/json\" --data '{\"tool\":\"category\",\"input\":\"hand poured lavender soy candle in amber jar\",\"market\":\"both\"}' -o t.json -w \"[HTTP %{http_code}] %{time_total}s\\\\n\")",
+      "Bash(/c/xampp/php/php.exe -r '$d=json_decode\\(file_get_contents\\(\"t.json\"\\),true\\);echo empty\\($d[\"result\"]\\)?\\(\"ERR:\".\\($d[\"error\"]??\"?\"\\)\\):\\(\"OK paths=\".count\\($d[\"result\"][\"paths\"]\\).\" attrs=\".count\\($d[\"result\"][\"attributes\"]\\).\"\\\\n  \".$d[\"result\"][\"paths\"][0][\"path\"]\\);')",
+      "Bash(/c/xampp/php/php.exe -r '$h=file_get_contents\\(\"page.html\"\\);if\\(preg_match\\(\"~<script>\\\\n?const \\\\\\\\\\\\$=\\(.*\\)</script>~s\",$h,$m\\)\\)file_put_contents\\(\"app.js\",$m[1]\\);')",
+      "Bash(/c/xampp/php/php.exe -r '$h=file_get_contents\\(\"page.html\"\\);$a=strpos\\($h,\"<script>\\\\n\"\\);$b=strrpos\\($h,\"</script>\"\\);if\\($a!==false\\)file_put_contents\\(\"app.js\",substr\\($h,$a+8,$b-$a-8\\)\\);')",
+      "Bash(\"/c/xampp/php/php.exe\" -l config.php)",
+      "Bash(\"/c/xampp/php/php.exe\" -l config.sample.php)",
+      "Bash(curl -s -m 6 http://localhost:8123/)",
+      "Bash(curl -s -m 6 -D - http://localhost:8123/ -o body.html)",
+      "Bash(\"/c/xampp/php/php.exe\" -l config.deploy.php)"
+    ]
+  }
+}

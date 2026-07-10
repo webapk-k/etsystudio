@@ -1,0 +1,21 @@
+# Render Blueprint — deploys Etsy Listing Studio as a free Docker web service.
+# In Render: New + → Blueprint → pick your repo. Then fill the secret values when prompted.
+services:
+  - type: web
+    name: etsy-listing-studio
+    runtime: docker
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: PROVIDER
+        value: gemini
+      - key: GEMINI_API_KEY      # paste your free Gemini key (aistudio.google.com)
+        sync: false
+      - key: ADMIN_EMAIL
+        value: admin@etsystudio.local
+      - key: ADMIN_PASSWORD      # your own secret admin password
+        sync: false
+      - key: GOOGLE_CLIENT_ID    # optional — for "Continue with Google"
+        sync: false
+      - key: FREE_LIMIT
+        value: "5"
