@@ -50,13 +50,15 @@ SYS;
           . "FOCUS: " . ($keyword !== '' ? $keyword : '(overall top-selling Etsy categories)') . "\n\n"
           . "Return ONLY a JSON object of this shape:\n"
           . '{ "categories": [ { "name": string, "demand": one of ["very high","high","medium"], '
-          . '"price_range": string (in the currency above), "why": string, "ideas": array of strings, "tags": array of strings } ] }';
+          . '"price_range": string (in the currency above), "why": string, "ideas": array of strings, "tags": array of strings } ], '
+          . '"suggestions": array of 3-4 strings (specific, actionable strategy tips for a NEW small Etsy seller entering these niches — how to pick, differentiate and price) }';
 
     $schema = [
         'type' => 'object',
         'additionalProperties' => false,
-        'required' => ['categories'],
+        'required' => ['categories', 'suggestions'],
         'properties' => [
+            'suggestions' => ['type' => 'array', 'items' => ['type' => 'string']],
             'categories' => [
                 'type' => 'array',
                 'items' => [
@@ -76,7 +78,7 @@ SYS;
         ],
     ];
 
-    $raw  = $client->message($system, $user, ['max_tokens' => 4000, 'json_schema' => $schema]);
+    $raw  = $client->message($system, $user, ['max_tokens' => 6000, 'json_schema' => $schema]);
     $data = json_decode($raw, true);
     if (!is_array($data) || empty($data['categories'])) { throw new RuntimeException('The model returned an unexpected format. Please try again.'); }
 

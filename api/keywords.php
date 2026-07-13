@@ -69,11 +69,15 @@ SYS;
           . '"keywords":[{"keyword":string,"demand":"low|medium|high","competition":"low|medium|high",'
           . '"opportunity":0-100,"trending":boolean} ...26-34 items],'
           . '"top_tags":array of 13 strings (<=20 chars each),'
-          . '"ideas":array of 4-6 strings}';
+          . '"ideas":array of 4-6 strings,'
+          . '"suggestions":{"best_bets":[{"keyword":string,"why":string} 3-5 (the smartest low-competition / high-intent keywords to target FIRST)],'
+          . '"avoid":array of 2-3 strings (over-saturated head terms a small seller should NOT rely on),'
+          . '"strategy":array of 3-4 strings (specific, actionable Etsy SEO tips for THIS niche),'
+          . '"title_idea":string (a ready Etsy title <=140 chars using the best keywords)}}';
 
     $schema = [
         'type' => 'object', 'additionalProperties' => false,
-        'required' => ['stats', 'keywords', 'top_tags', 'ideas'],
+        'required' => ['stats', 'keywords', 'top_tags', 'ideas', 'suggestions'],
         'properties' => [
             'stats' => [
                 'type' => 'object', 'additionalProperties' => false,
@@ -104,10 +108,27 @@ SYS;
             ],
             'top_tags' => ['type' => 'array', 'items' => ['type' => 'string']],
             'ideas'    => ['type' => 'array', 'items' => ['type' => 'string']],
+            'suggestions' => [
+                'type' => 'object', 'additionalProperties' => false,
+                'required' => ['best_bets', 'avoid', 'strategy', 'title_idea'],
+                'properties' => [
+                    'best_bets' => [
+                        'type' => 'array',
+                        'items' => [
+                            'type' => 'object', 'additionalProperties' => false,
+                            'required' => ['keyword', 'why'],
+                            'properties' => ['keyword' => ['type' => 'string'], 'why' => ['type' => 'string']],
+                        ],
+                    ],
+                    'avoid'      => ['type' => 'array', 'items' => ['type' => 'string']],
+                    'strategy'   => ['type' => 'array', 'items' => ['type' => 'string']],
+                    'title_idea' => ['type' => 'string'],
+                ],
+            ],
         ],
     ];
 
-    $raw  = $client->message($system, $user, ['max_tokens' => 5000, 'json_schema' => $schema]);
+    $raw  = $client->message($system, $user, ['max_tokens' => 7000, 'json_schema' => $schema]);
     $data = json_decode($raw, true);
     if (!is_array($data) || empty($data['keywords'])) { throw new RuntimeException('The model returned an unexpected format. Please try again.'); }
 

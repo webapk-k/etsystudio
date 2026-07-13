@@ -10,7 +10,35 @@
       "Bash(\"/c/xampp/php/php.exe\" -l config.sample.php)",
       "Bash(curl -s -m 6 http://localhost:8123/)",
       "Bash(curl -s -m 6 -D - http://localhost:8123/ -o body.html)",
-      "Bash(\"/c/xampp/php/php.exe\" -l config.deploy.php)"
+      "Bash(\"/c/xampp/php/php.exe\" -l config.deploy.php)",
+      "Bash(curl -s -o /dev/null -w \"current: HTTP %{http_code}\\\\n\" -m 4 http://localhost:8123/)",
+      "Bash(curl -s -o /dev/null -w \"after restart: HTTP %{http_code}\\\\n\" -m 6 http://localhost:8123/)",
+      "Bash(powershell -NoProfile -Command \"Start-Process 'http://localhost:8123/'\")",
+      "Skill(dataviz)",
+      "Skill(dataviz:*)",
+      "Bash(\"/c/xampp/php/php.exe\" -l api/analyze.php)",
+      "Bash(command -v node)",
+      "Bash(node --check app.js)",
+      "Bash(curl -s -m 90 -X POST http://localhost:8123/api/analyze.php -H \"Content-Type: application/json\" --data '{\"url\":\"https://www.aliexpress.com/item/1005009957578600.html\"}' -o an.json -w \"[HTTP %{http_code}] %{time_total}s\\\\n\")",
+      "Bash(/c/xampp/php/php.exe -r '$d=json_decode\\(file_get_contents\\(\"an.json\"\\),true\\);$r=$d[\"result\"]??null;echo $r?\\(\"OK score=\".$r[\"seo_score\"].\" tags=\".count\\($r[\"better_tags\"]\\).\" improvements=\".count\\($r[\"improvements\"]\\).\"\\\\n title: \".substr\\($r[\"better_title\"],0,55\\)\\):\\(\"ERR: \".\\($d[\"error\"]??\"?\"\\)\\);')",
+      "Bash(\"/c/xampp/php/php.exe\" \"/c/Users/tmasl/AppData/Local/Temp/claude/c--xampp-htdocs-etsyai/c184fab9-4a49-4069-8c6b-3bd7f3ca50c4/scratchpad/etsy_diag.php\")",
+      "Bash(curl -s -m 60 -X POST http://localhost:8123/api/analyze.php -H \"Content-Type: application/json\" --data '{\"url\":\"https://www.etsy.com/listing/4476225845/blue-teacup-plush-toy-jellycat-inspired?ls=s&ga_order=most_relevant\"}' -o an.json -w \"[HTTP %{http_code}] %{time_total}s\\\\n\")",
+      "Bash(curl -s -m 60 -X POST http://localhost:8123/api/keywords.php -H \"Content-Type: application/json\" --data '{\"seed\":\"soy candle\",\"market\":\"both\"}' -o k.json -w \"[HTTP %{http_code}] %{time_total}s\\\\n\")",
+      "Bash(/c/xampp/php/php.exe -r '$d=json_decode\\(file_get_contents\\(\"k.json\"\\),true\\);echo \"top keys: \".implode\\(\",\",array_keys\\($d\\)\\).\"\\\\n\";if\\(isset\\($d[\"data\"]\\)\\)echo \"data keys: \".implode\\(\",\",array_keys\\($d[\"data\"]\\)\\).\"\\\\n\";echo \"raw size: \".filesize\\(\"k.json\"\\).\" bytes\\\\n\";echo \"has suggestions: \".\\(isset\\($d[\"data\"][\"suggestions\"]\\)?\"YES\":\"NO\"\\).\"\\\\n\";')",
+      "Bash(\"/c/xampp/php/php.exe\" -l api/research.php)",
+      "Bash(curl -s -m 60 -X POST http://localhost:8123/api/research.php -H \"Content-Type: application/json\" --data '{\"keyword\":\"jewellery\",\"market\":\"both\"}' -o r.json -w \"[HTTP %{http_code}] %{time_total}s\\\\n\")",
+      "Bash(curl -s -m 70 -X POST http://localhost:8123/api/research.php -H \"Content-Type: application/json\" --data '{\"keyword\":\"jewellery\",\"market\":\"both\"}' -o r.json -w \"[HTTP %{http_code}] %{time_total}s\\\\n\")",
+      "Bash(/c/xampp/php/php.exe -r '$d=json_decode\\(file_get_contents\\(\"r.json\"\\),true\\);$s=$d[\"research\"][\"suggestions\"]??null;echo $s?\\(\"OK cats=\".count\\($d[\"research\"][\"categories\"]\\).\" suggestions=\".count\\($s\\).\"\\\\n  • \".substr\\($s[0],0,72\\)\\):\\(\"FAIL: \".\\($d[\"error\"]??\"?\"\\)\\);')",
+      "Read(//c/Users/tmasl/AppData/Local/Temp/claude/c--xampp-htdocs-etsyai/c184fab9-4a49-4069-8c6b-3bd7f3ca50c4/scratchpad/**)",
+      "Bash(awk '{print \"audit2: \"$5\" bytes\"}')",
+      "Bash(powershell -NoProfile -Command \"Get-Process msedge -ErrorAction SilentlyContinue | Stop-Process -Force; Remove-Item -Recurse -Force 'C:\\\\Users\\\\tmasl\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--xampp-htdocs-etsyai\\\\c184fab9-4a49-4069-8c6b-3bd7f3ca50c4\\\\scratchpad\\\\prof7' -ErrorAction SilentlyContinue\")",
+      "Bash(cd /c/xampp/htdocs/etsyai *)",
+      "Read(//c/xampp/htdocs/etsyai/**)",
+      "Bash(sed 's/^/temp-hook leftover \\(0 expected\\): /')",
+      "Bash(sed 's/^/parallel-layout: /')"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\tmasl\\.claude\\projects\\c--xampp-htdocs-etsyai\\memory"
     ]
   }
 }

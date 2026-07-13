@@ -195,8 +195,8 @@ class Gemini
             $msg = $json['error']['message'] ?? ('HTTP ' . $status);
             if ($status === 400 && stripos($msg, 'API key') !== false) $msg = 'Your Gemini API key was rejected. Check the key in config.php.';
             if ($status === 403) $msg = 'Gemini rejected the key or the request. Make sure the key is valid (aistudio.google.com).';
-            if ($status === 429) $msg = 'Gemini rate limit hit for this model.';
-            if ($status === 503) $msg = 'Gemini is busy (high demand).';
+            if ($status === 429) $msg = 'Gemini free limit reached (quota exhausted). Wait about a minute and try again — or enable billing on your key / paste a fresh free key in config.php for higher limits.';
+            if ($status === 503) $msg = 'Gemini is busy (high demand). Please try again in a few seconds.';
             $e = new GeminiException('Gemini API error: ' . $msg);
             $e->retryable = in_array($status, [429, 500, 503], true);   // transient → retry / fall back
             throw $e;

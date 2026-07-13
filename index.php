@@ -443,6 +443,73 @@ body.noauth #inputCard{display:none}
 .dash-tile .ti svg{width:20px;height:20px}
 .dash-tile b{font-size:15px;display:block}
 .dash-tile span{font-size:12.5px;color:var(--muted);margin-top:3px;display:block;line-height:1.45}
+.dgrid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.anz{margin-bottom:16px;background:linear-gradient(145deg,var(--accent),var(--accent-2));border-color:transparent;box-shadow:var(--sh-md)}
+.anz .lbl{color:rgba(255,255,255,.95)}
+.anz .hint{color:rgba(255,255,255,.88)}
+.anz .urlbox{background:#fff;border-color:transparent;box-shadow:0 2px 10px -2px rgba(0,0,0,.18)}
+.anz .urlbox svg{color:var(--accent)}
+.anz .urlbox input{color:#211E19}
+.anz .btn.primary{background:#22190f;color:#fff;border-color:transparent}
+.anz .btn.primary:hover{background:#000;transform:translateY(-1px)}
+.dash-grid.mini{grid-template-columns:1fr 1fr;gap:10px}
+.dash-grid.mini .dash-tile{padding:14px}
+.dash-grid.mini .dash-tile .ti{width:34px;height:34px;margin-bottom:8px}
+.dash-grid.mini .dash-tile b{font-size:13.5px}
+.trow,.crow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)}
+.trow:last-child,.crow:last-child{border-bottom:0}
+.tkw{font-weight:600;color:var(--text);text-decoration:none;font-size:14px}
+.tkw:hover{color:var(--accent)}
+.sugcard{background:linear-gradient(180deg,var(--accent-weak),var(--surface));border-color:var(--accent-line)}
+.bblist{display:flex;flex-direction:column;gap:8px}
+.bbrow{display:flex;flex-direction:column;gap:2px;padding:10px 13px;background:var(--surface);border:1px solid var(--border);border-radius:10px}
+.bbrow .tkw{font-size:14px}
+.bbrow .muted{font-size:12.5px;line-height:1.5}
+.anz .disc-btn{color:rgba(255,255,255,.92)}
+.anz .disc-panel textarea{background:#fff;color:#211E19;border-color:transparent}
+.audit-modal{max-width:800px;width:100%;max-height:88vh;padding:0;display:flex;flex-direction:column;overflow:hidden}
+.audit-hd{display:flex;align-items:center;justify-content:space-between;padding:15px 22px;border-bottom:1px solid var(--border);background:var(--surface);flex:0 0 auto}
+.audit-hd .lbl{font-size:13px}
+.audit-body{padding:20px 22px 26px;overflow-y:auto}
+.ringwrap{display:flex;flex-direction:column;align-items:center;gap:6px;flex:0 0 auto}
+.verdict{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.audit-cols{display:grid;grid-template-columns:1.05fr .95fr;gap:24px;margin-top:18px;align-items:start}
+.acol{min-width:0}
+.colhd{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:10px}
+.colhd .n{color:var(--faint);font-weight:600;margin-left:5px}
+@media (max-width:640px){.audit-cols{grid-template-columns:1fr;gap:16px}}
+.strengths{margin-top:12px;font-size:13px;color:var(--ok-ink,#1E6B3E);background:var(--ok-bg,#E8F2E9);border-radius:9px;padding:9px 13px;line-height:1.55}
+.asec{border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-top:14px}
+.asec-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:15px;font-weight:700;margin-bottom:12px}
+.asec-hd .faint{font-weight:600;font-size:12px}
+.asec-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.sublbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:6px}
+.sublbl.anzrow{display:flex;justify-content:space-between;align-items:center}
+.secbadge{font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px;white-space:nowrap;flex:0 0 auto}
+.secbadge.err{background:var(--err-bg,#F8E4DF);color:var(--err-ink,#973020)}
+.secbadge.warn{background:var(--warn-bg,#FAEFD7);color:var(--warn-ink,#8A5E0C)}
+.secbadge.ok{background:var(--ok-bg,#E8F2E9);color:var(--ok-ink,#1E6B3E)}
+.desc.sm{font-size:13px;line-height:1.55}
+@media (max-width:640px){.asec-cols{grid-template-columns:1fr;gap:12px}}
+.audit-top{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.atiles{flex:1;min-width:250px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.atile{background:var(--surface-2);border:1px solid var(--border);border-radius:11px;padding:11px 13px}
+.atile .k{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.atile .v{font-size:21px;font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums}
+.atile .v small{font-size:11px;color:var(--muted);font-weight:600;margin-left:1px}
+.atile.ok{border-color:color-mix(in srgb,var(--ok) 45%,var(--border))}
+.atile.warn .v{color:var(--warn,#C58A17)}.atile.bad .v{color:var(--err,#c0392b)}
+.atile.bad{border-color:color-mix(in srgb,var(--err,#c0392b) 40%,var(--border))}
+.isslist{list-style:none;padding:0;margin:8px 0 0;display:flex;flex-direction:column;gap:7px}
+.iss{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.5;padding:9px 12px;border-radius:9px;border:1px solid var(--border)}
+.iss .issi{flex:0 0 20px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;color:#fff;margin-top:1px}
+.iss.err{background:var(--err-bg,#F8E4DF);border-color:transparent}.iss.err .issi{background:var(--err,#c0392b)}
+.iss.warn{background:var(--warn-bg,#FAEFD7);border-color:transparent}.iss.warn .issi{background:var(--warn,#C58A17)}
+.iss.ok{background:var(--ok-bg,#E8F2E9);border-color:transparent}.iss.ok .issi{background:var(--ok,#2F8F57)}
+@media (max-width:560px){.atiles{grid-template-columns:repeat(2,1fr)}}
+.crow b{font-size:14px}
+.cdays{font-weight:800;font-size:15px;color:var(--accent);font-variant-numeric:tabular-nums;flex:0 0 auto}
+@media (max-width:820px){.dgrid2{grid-template-columns:1fr}}
 
 @media (max-width:820px){
   .sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);transition:transform .2s;box-shadow:0 0 40px rgba(0,0,0,.25)}
@@ -663,6 +730,7 @@ const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelect
 const IC=$('#ic').content, icon=n=>IC.querySelector('.i-'+n).cloneNode(true);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const GOOGLE_CLIENT_ID=<?= json_encode($googleClientId) ?>;
+window.addEventListener('error',function(e){try{document.documentElement.setAttribute('data-jserr',(e.message||'')+' @ '+String(e.filename||'').split('/').pop()+':'+(e.lineno||0)+':'+(e.colno||0));}catch(_){}});
 
 /* Google Sign-In (real GIS if a Client ID is set in config.php; else a button with setup steps) */
 const gLogo=()=>'<svg width="17" height="17" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.2 17.6 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.1 5.3-4.6 7l7.1 5.5c4.2-3.9 6.6-9.6 6.6-16z"/><path fill="#FBBC05" d="M10.4 28.3c-.5-1.4-.8-2.9-.8-4.3s.3-3 .8-4.3l-7.8-6.1C.9 16.7 0 20.2 0 24s.9 7.3 2.6 10.4l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.2 0 11.5-2 15.3-5.5l-7.1-5.5c-2 1.3-4.6 2.1-8.2 2.1-6.4 0-11.7-3.7-13.6-9.8l-7.8 6.1C6.5 42.6 14.6 48 24 48z"/></svg>';
@@ -1369,21 +1437,142 @@ function renderDashboard(){
   const a=getAccount()||{},w=frame();
   const gen=+localStorage.getItem('els-gencount')||0,kw=kwListGet().length;
   const left=usage.unlimited?'∞':(usage.remaining!=null?usage.remaining:'—');
-  const tiles=[
-    {v:'generator',t:'New Listing',d:'Link, photo or paste → full Etsy listing',i:'edit'},
-    {v:'keywords',t:'Keyword Research',d:'Find what buyers search + save lists',i:'search'},
-    {v:'research',t:'Product Research',d:'Best-selling niches & ideas',i:'trend'},
-    {v:'tools',t:'Tools',d:'Fee & profit calculators, more',i:'tool'},
-    {v:'plans',t:'Plans & Pricing',d:'Upgrade for unlimited listings',i:'star'},
-  ];
-  w.innerHTML=`<div class="dash-hd"><h1>Welcome${a.name?', '+esc(String(a.name).split(' ')[0]):''} 👋</h1><p>Your Etsy toolkit — pick a tool to get started.</p></div>
-    <div class="dash-stats">
-      <div class="dash-stat"><div class="k">Free listings left</div><div class="v">${left}</div></div>
-      <div class="dash-stat"><div class="k">Listings generated</div><div class="v">${gen}</div></div>
-      <div class="dash-stat"><div class="k">Saved keywords</div><div class="v">${kw}</div></div>
+  const mini=[['generator','New Listing','edit'],['keywords','Keyword Research','search'],['research','Product Research','trend'],['tools','Calculators','tool']];
+  w.innerHTML=`
+  <div class="dash-hd"><h1>Welcome${a.name?', '+esc(String(a.name).split(' ')[0]):''} 👋</h1><p>Your Etsy command centre — analyse, research and create.</p></div>
+  <section class="card pad anz">
+    <div class="chead"><span class="lbl">🔎 Look up any Etsy listing or shop</span></div>
+    <div class="urlrow"><div class="urlbox"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input id="anUrl" placeholder="Paste an Etsy listing or shop URL…" autocomplete="off"></div><button class="btn primary" id="anGo">Analyze</button></div>
+    <p class="hint">Instant AI audit — score, tag-by-tag checklist, what to fix, and a better title + 13 tags + description.</p>
+    <div class="disc anzdisc"><button class="disc-btn" id="anDiscBtn" aria-expanded="false"><span class="car">▸</span> Paste your listing details for a full audit</button>
+      <div class="disc-panel" id="anDiscPanel" hidden><textarea id="anPaste" placeholder="Paste your Etsy listing — title, your 13 tags (comma separated) and the description — for a deep tag-by-tag audit (Etsy blocks reading it live)."></textarea></div>
     </div>
-    <div class="dash-grid">${tiles.map(t=>`<button class="dash-tile" data-go="${t.v}"><div class="ti">${dashIcon(t.i)}</div><b>${esc(t.t)}</b><span>${esc(t.d)}</span></button>`).join('')}</div>`;
+  </section>
+  <div class="dash-stats">
+    <div class="dash-stat"><div class="k">Free listings left</div><div class="v">${left}</div></div>
+    <div class="dash-stat"><div class="k">Listings generated</div><div class="v">${gen}</div></div>
+    <div class="dash-stat"><div class="k">Saved keywords</div><div class="v">${kw}</div></div>
+  </div>
+  <div class="dgrid2">
+    <section class="card pad"><div class="chead"><span class="lbl">📈 Trending on Etsy <span class="engpill">AI</span></span><button class="btn ghost sm" id="trendMore">Research →</button></div><div id="trendBox"></div></section>
+    <section class="card pad"><div class="chead"><span class="lbl">📅 Seasonal calendar</span></div><div id="calBox"></div></section>
+    <section class="card pad"><div class="chead"><span class="lbl">🔑 Your keyword list</span><button class="btn ghost sm" id="kwMore">Open →</button></div><div id="kwBox"></div></section>
+    <section class="card pad"><div class="chead"><span class="lbl">⚡ Quick tools</span></div><div class="dash-grid mini">${mini.map(t=>`<button class="dash-tile" data-go="${t[0]}"><div class="ti">${dashIcon(t[2])}</div><b>${esc(t[1])}</b></button>`).join('')}</div></section>
+  </div>`;
+  $('#anGo').onclick=analyzeRun;$('#anUrl').addEventListener('keydown',e=>{if(e.key==='Enter')analyzeRun();});
+  $('#anDiscBtn').onclick=e=>{const on=e.currentTarget.getAttribute('aria-expanded')==='true';e.currentTarget.setAttribute('aria-expanded',String(!on));$('#anDiscPanel').hidden=on;if(!on)$('#anPaste').focus();};
+  $('#trendMore').onclick=()=>showView('research');$('#kwMore').onclick=()=>showView('keywords');
   $$('.dash-tile',w).forEach(b=>b.onclick=()=>showView(b.dataset.go));
+  dashTrending($('#trendBox'));dashCalendar($('#calBox'));dashKw($('#kwBox'));
+}
+/* Analyze / audit an Etsy listing (URL or pasted details) — shown in a popup */
+function auditEsc(e){if(e.key==='Escape')closeAuditModal();}
+function closeAuditModal(){const o=$('#auditOv');if(o)o.remove();document.removeEventListener('keydown',auditEsc);}
+function openAuditModal(){
+  closeAuditModal();
+  const ov=document.createElement('div');ov.className='modal-ov';ov.id='auditOv';
+  ov.innerHTML=`<div class="modal audit-modal"><div class="audit-hd"><span class="lbl">🔎 Listing Audit <span class="engpill">AI</span></span><button class="icobtn" id="auX" title="Close">✕</button></div><div class="audit-body" id="auBody"></div></div>`;
+  document.body.appendChild(ov);
+  ov.onclick=e=>{if(e.target===ov)closeAuditModal();};
+  $('#auX',ov).onclick=closeAuditModal;
+  document.addEventListener('keydown',auditEsc);
+  return $('#auBody',ov);
+}
+function analyzeRun(){
+  const url=$('#anUrl').value.trim(),paste=($('#anPaste')?$('#anPaste').value.trim():''),go=$('#anGo');
+  if(!url&&!paste){$('#anUrl').focus();return;}
+  go.disabled=true;go.textContent='Auditing…';
+  const body=openAuditModal();
+  body.innerHTML=`<div class="bar"><i></i></div><div class="skel" style="width:60%"></div><div class="skel" style="width:82%"></div><div class="skel" style="width:50%"></div><div class="muted" style="margin-top:12px;font-size:12.5px">Auditing the listing — title, tags, description &amp; issues… (~15–40s)</div>`;
+  fetch('api/analyze.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url,paste,token:getToken()})})
+    .then(r=>r.json()).then(d=>{
+      const b=$('#auBody');if(!b)return;
+      if(d.error){b.innerHTML=`<div class="banner caution"><span class="ic">!</span><div>${esc(d.error)}</div></div>`;return;}
+      fillAudit(b,d);
+    }).catch(e=>{const b=$('#auBody');if(b)b.innerHTML=`<div class="banner caution"><span class="ic">!</span><div>Network error: ${esc(e.message)}</div></div>`;})
+    .finally(()=>{go.disabled=false;go.textContent='Analyze';});
+}
+function fillAudit(body,d){
+  const r=d.result||{},det=r.detected||{},sc=+r.seo_score||0;
+  const col=sc>=70?'var(--ok)':sc>=45?'var(--warn,#DBAA46)':'var(--err,#c0392b)';
+  const verdict=sc>=80?'Excellent':sc>=60?'Good':sc>=40?'Needs work':'Poor';
+  const title=det.title||r.name||'',tags=Array.isArray(det.tags)?det.tags:[],desc=det.description||'';
+  const tLen=title.length,tCount=tags.length;
+  const single=tags.filter(t=>String(t).trim().split(/\s+/).filter(Boolean).length===1);
+  const cleanMd=x=>esc(String(x).replace(/\*\*/g,''));
+  const sev={error:['✕','err'],warn:['!','warn'],good:['✓','ok']};
+  const issues=r.issues||[];
+  const inSec=k=>issues.filter(i=>(i.section||'title')===k);
+  const issList=arr=>arr.length?`<ul class="isslist">${arr.map(i=>{const s=sev[i.severity]||sev.warn;return `<li class="iss ${s[1]}"><span class="issi">${s[0]}</span><span>${cleanMd(i.text)}</span></li>`;}).join('')}</ul>`:'<div class="muted" style="font-size:12.5px">No issues here — looks good.</div>';
+  const badge=arr=>{const e=arr.filter(i=>i.severity==='error').length,wn=arr.filter(i=>i.severity==='warn').length;return e?`<span class="secbadge err">${e} to fix</span>`:wn?`<span class="secbadge warn">${wn} to improve</span>`:`<span class="secbadge ok">✓ Good</span>`;};
+  const chips=arr=>arr.map(t=>{const bad=String(t).trim().split(/\s+/).filter(Boolean).length===1||String(t).length>20;return `<span class="chip static${bad?' over':''}">${esc(t)}</span>`;}).join('');
+  body.innerHTML=`
+    ${d.from_title?'<div class="muted" style="font-size:12px;margin-bottom:14px;line-height:1.5">ℹ️ Etsy blocks live reads, so only the <b>title</b> was read. For a full audit incl. your tags/description, close this and use “Paste your listing details”.</div>':''}
+    <div class="audit-top">
+      <div class="ringwrap"><div class="ring" style="--v:${sc};--sc:${col}"><div class="num">${sc}<small>/100</small></div></div><div class="verdict" style="color:${col}">${verdict}</div></div>
+      <div class="atiles">
+        <div class="atile ${tLen>140?'bad':tLen>=70?'ok':'warn'}"><div class="k">Title</div><div class="v">${tLen}<small>/140</small></div></div>
+        <div class="atile ${tCount===13?'ok':tCount?'warn':''}"><div class="k">Tags</div><div class="v">${tCount||'—'}<small>/13</small></div></div>
+        <div class="atile ${single.length?'bad':(tCount?'ok':'')}"><div class="k">1-word tags</div><div class="v">${tCount?single.length:'—'}</div></div>
+        <div class="atile ${desc.length?(desc.length>=250?'ok':'warn'):''}"><div class="k">Description</div><div class="v">${desc.length||'—'}<small>${desc.length?'ch':''}</small></div></div>
+      </div>
+    </div>
+    <div class="rationale" style="margin-top:14px">${esc(r.summary||'')}</div>
+    ${(r.strengths||[]).length?`<div class="strengths"><b>✓ Strengths:</b> ${r.strengths.map(cleanMd).join(' · ')}</div>`:''}
+
+    <div class="asec"><div class="asec-hd"><span>📝 Title</span>${badge(inSec('title'))}</div>
+      <div class="asec-cols"><div>${issList(inSec('title'))}</div>
+        <div>${title?`<div class="sublbl">Current</div><div class="desc sm">${esc(title)}</div>`:''}
+          <div class="sublbl" style="margin-top:12px">✦ Better title <span class="faint">(${(r.better_title||'').length}/140)</span></div><div class="desc sm" style="font-weight:600">${esc(r.better_title||'')}</div></div></div>
+    </div>
+
+    <div class="asec"><div class="asec-hd"><span>🏷️ Tags <span class="faint">${tCount}/13</span></span>${badge(inSec('tags'))}</div>
+      ${issList(inSec('tags'))}
+      ${tags.length?`<div class="sublbl" style="margin-top:12px">Current tags <span class="faint">(red = weak)</span></div><div class="chips">${chips(tags)}</div>`:''}
+      <div class="sublbl anzrow" style="margin-top:14px">✦ Better 13 tags <button class="btn primary sm" id="auCopyTags">Copy all</button></div><div class="chips" id="auTags"></div>
+    </div>
+
+    <div class="asec"><div class="asec-hd"><span>📄 Description ${desc.length?`<span class="faint">${desc.length} ch</span>`:''}</span>${badge(inSec('description'))}</div>
+      ${issList(inSec('description'))}
+      ${r.better_description?`<div class="sublbl" style="margin-top:12px">✦ Better description</div><div class="desc sm">${esc(r.better_description)}</div>`:''}
+    </div>
+
+    <div class="asec"><div class="asec-hd"><span>🖼️ Media &amp; Images</span>${badge(inSec('media'))}</div>
+      ${issList(inSec('media'))}
+    </div>
+
+    <div class="asec"><div class="asec-hd"><span>📋 Attributes &amp; Category</span>${badge(inSec('attributes'))}</div>
+      ${issList(inSec('attributes'))}
+    </div>`;
+  const tg=$('#auTags',body);(r.better_tags||[]).forEach(t=>{const c=document.createElement('span');c.className='chip';c.textContent=t;c.title='Copy';c.onclick=async()=>{if(await copyText(t)){c.classList.add('flash');setTimeout(()=>c.classList.remove('flash'),700);}};tg.appendChild(c);});
+  const cb=$('#auCopyTags',body);if(cb)cb.onclick=async()=>{if(await copyText((r.better_tags||[]).join(', '))){cb.textContent='Copied ✓';setTimeout(()=>cb.textContent='Copy all',1400);}};
+  body.scrollTop=0;
+}
+/* dashboard widgets */
+let trendCache=null;
+function dashTrending(box){
+  if(!box)return;
+  if(trendCache){fillTrend(box,trendCache);return;}
+  box.innerHTML=`<div class="skel" style="width:70%"></div><div class="skel" style="width:88%"></div><div class="skel" style="width:60%"></div>`;
+  fetch('api/research.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({keyword:'',market})})
+    .then(r=>r.json()).then(d=>{const cats=(d.research&&d.research.categories)||[];trendCache=cats;fillTrend(box,cats);})
+    .catch(e=>{box.innerHTML='<div class="muted">Could not load trends — try Product Research.</div>';});
+}
+function fillTrend(box,cats){
+  if(!cats||!cats.length){box.innerHTML='<div class="muted">No trends right now.</div>';return;}
+  const cls={'very high':'good',high:'good',medium:'mid',low:'low'};
+  box.innerHTML=cats.slice(0,6).map(c=>`<div class="trow"><a class="tkw" href="https://www.etsy.com/search?q=${encodeURIComponent(c.name||'')}" target="_blank" rel="noopener noreferrer">${esc(c.name||'')}</a><span class="kpill ${cls[String(c.demand).toLowerCase()]||'mid'}">${esc(c.demand||'')}</span></div>`).join('');
+}
+const CAL_EVENTS=[['Halloween','2026-10-31','halloween decor'],['Thanksgiving (US)','2026-11-26','thanksgiving decor'],['Black Friday','2026-11-27','black friday sale'],['Christmas','2026-12-25','christmas gift'],['New Year','2027-01-01','new year gift'],["Valentine's Day",'2027-02-14','valentines gift'],["Mother's Day (UK)",'2027-03-14','mothers day gift'],['Easter','2027-04-04','easter gift'],["Mother's Day (US)",'2027-05-09','mothers day gift'],["Father's Day",'2027-06-20','fathers day gift']];
+function dashCalendar(box){
+  if(!box)return;
+  const now=new Date();now.setHours(0,0,0,0);
+  const rows=CAL_EVENTS.map(e=>{const d=new Date(e[1]+'T00:00:00');return{n:e[0],kw:e[2],date:d,days:Math.ceil((d-now)/86400000)};}).filter(x=>x.days>=0).sort((a,b)=>a.days-b.days).slice(0,5);
+  box.innerHTML=rows.map(r=>`<div class="crow"><div><b>${esc(r.n)}</b><span class="muted" style="display:block;font-size:11.5px;margin-top:1px">${r.date.toLocaleDateString(undefined,{month:'short',day:'numeric'})} · <a href="https://www.etsy.com/search?q=${encodeURIComponent(r.kw)}" target="_blank" rel="noopener noreferrer" style="color:var(--accent);text-decoration:none">${esc(r.kw)}</a></span></div><span class="cdays">${r.days}d</span></div>`).join('')||'<div class="muted">—</div>';
+}
+function dashKw(box){
+  if(!box)return;const a=kwListGet();
+  box.innerHTML=a.length?`<div class="chips">${a.slice(0,14).map(k=>`<span class="chip static">${esc(k)}</span>`).join('')}</div>${a.length>14?`<div class="muted" style="margin-top:8px;font-size:12px">+${a.length-14} more</div>`:''}`:'<div class="muted">No saved keywords yet — star ☆ keywords in <b>Keyword Research</b> to build your list.</div>';
 }
 /* ---- admin panel ---- */
 function renderAdmin(){
@@ -1466,16 +1655,19 @@ function renderTools(){
   stk.appendChild(soon);
 }
 
-if(isAuthed()){
-  const a=getAccount()||{};
-  document.body.classList.remove('noauth');document.body.classList.toggle('is-admin',!!a.is_admin);
-  mountAccount();showView(a.is_admin?'admin':'dashboard');
-  authApi('me',{token:getToken()}).then(r=>{
-    if(r&&r.user){usage={used:r.user.used||0,limit:r.user.limit||5,unlimited:!!r.user.unlimited,remaining:r.user.remaining};renderUsage();
-      setAccount({name:r.user.name,email:r.user.email,is_admin:!!r.user.is_admin,plan:r.user.plan});document.body.classList.toggle('is-admin',!!r.user.is_admin);}
-    else if(r&&r.error){signOut();}
-  });
-}else{document.body.classList.add('noauth');renderLanding();}
+/* run boot AFTER the whole script has parsed, so every const (kwListGet, CAL_EVENTS…) is initialised */
+setTimeout(function(){
+  if(isAuthed()){
+    const a=getAccount()||{};
+    document.body.classList.remove('noauth');document.body.classList.toggle('is-admin',!!a.is_admin);
+    mountAccount();showView(a.is_admin?'admin':'dashboard');
+    authApi('me',{token:getToken()}).then(r=>{
+      if(r&&r.user){usage={used:r.user.used||0,limit:r.user.limit||5,unlimited:!!r.user.unlimited,remaining:r.user.remaining};renderUsage();
+        setAccount({name:r.user.name,email:r.user.email,is_admin:!!r.user.is_admin,plan:r.user.plan});document.body.classList.toggle('is-admin',!!r.user.is_admin);}
+      else if(r&&r.error){signOut();}
+    });
+  }else{document.body.classList.add('noauth');renderLanding();}
+},0);
 
 /* research */
 function renderResearch(){
@@ -1499,8 +1691,9 @@ function runResearch(){
   fetch('api/research.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({keyword,market})})
     .then(r=>r.json()).then(d=>{
       if(d.error){out.innerHTML=`<div class="banner caution"><span class="ic">!</span><div>${esc(d.error)}</div></div>`;return;}
-      const cats=(d.research&&d.research.categories)||[];
-      out.innerHTML=cats.length?`<div class="stack">${cats.map(researchCard).join('')}</div>`:'<div class="card pad muted">No categories returned — try a different keyword.</div>';
+      const cats=(d.research&&d.research.categories)||[],sug=(d.research&&d.research.suggestions)||[];
+      const sugHtml=sug.length?`<section class="card pad sugcard"><div class="chead"><span class="lbl">✦ AI Suggestions</span></div><ul class="tips">${sug.map(x=>`<li>${esc(String(x).replace(/\*\*/g,''))}</li>`).join('')}</ul></section>`:'';
+      out.innerHTML=cats.length?`<div class="stack">${sugHtml}${cats.map(researchCard).join('')}</div>`:'<div class="card pad muted">No categories returned — try a different keyword.</div>';
     }).catch(e=>{out.innerHTML=`<div class="banner caution"><span class="ic">!</span><div>Network error: ${esc(e.message)}</div></div>`;})
     .finally(()=>{rgo.disabled=false;rgo.textContent='Find categories';});
 }
@@ -1571,6 +1764,18 @@ function renderKwResult(out,d){
    </div>
    ${st.summary?`<div class="rationale" style="margin-top:12px">${esc(st.summary)}${st.trend_note?' '+esc(st.trend_note):''}</div>`:''}`;
   wrap.appendChild(hb);
+  {const sug=(d.data.suggestions)||{};
+   if((sug.best_bets&&sug.best_bets.length)||(sug.strategy&&sug.strategy.length)){
+     const sc=document.createElement('section');sc.className='card pad sugcard';
+     const bb=(sug.best_bets||[]).map(b=>`<div class="bbrow"><a class="tkw" href="${etsyUrl(b.keyword||'')}" target="_blank" rel="noopener noreferrer">${esc(b.keyword||'')}</a><span class="muted">${esc(b.why||'')}</span></div>`).join('');
+     sc.innerHTML=`<div class="chead"><span class="lbl">✦ AI Suggestions</span></div>
+       ${bb?`<div class="sugt">🎯 Target these first — best opportunity</div><div class="bblist">${bb}</div>`:''}
+       ${sug.title_idea?`<div class="sugt" style="margin-top:16px">📝 Ready-to-use title</div><div class="desc" style="font-weight:600">${esc(sug.title_idea)}</div>`:''}
+       ${(sug.strategy&&sug.strategy.length)?`<div class="sugt" style="margin-top:16px">💡 Strategy</div><ul class="tips">${sug.strategy.map(x=>`<li>${esc(String(x).replace(/\*\*/g,''))}</li>`).join('')}</ul>`:''}
+       ${(sug.avoid&&sug.avoid.length)?`<div class="sugt" style="margin-top:14px">⚠️ Avoid — too saturated for a small shop</div><div class="chips">${sug.avoid.map(x=>`<span class="chip static">${esc(x)}</span>`).join('')}</div>`:''}`;
+     if(sug.title_idea){const cb=copyBtn(()=>sug.title_idea);$('.chead',sc).appendChild(cb);}
+     wrap.appendChild(sc);
+   }}
   if(tags.length){const tc=document.createElement('section');tc.className='card pad';
     tc.innerHTML=`<div class="chead"><span class="lbl">Best 13 tags (ready to paste)</span></div>`;
     const ch=document.createElement('div');ch.className='chips';
