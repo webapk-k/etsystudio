@@ -74,8 +74,8 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:var(--fs);font-
   padding:14px 24px;background:color-mix(in srgb,var(--bg) 78%,transparent);backdrop-filter:saturate(1.4) blur(10px);
   border-bottom:1px solid var(--border)}
 .brand{display:flex;align-items:center;gap:12px}
-.logo{width:34px;height:34px;border-radius:11px;background:linear-gradient(140deg,var(--accent),var(--accent-2));
-  display:grid;place-items:center;color:var(--accent-ink);box-shadow:0 4px 12px -3px var(--ring);flex:0 0 auto}
+.logo{width:34px;height:34px;border-radius:11px;background:#fff;border:1px solid var(--border);
+  display:grid;place-items:center;color:var(--accent);box-shadow:0 3px 10px -4px var(--ring);flex:0 0 auto}
 .brand b{font-size:16px;font-weight:700;letter-spacing:-.02em;display:block;line-height:1.15}
 .brand span{font-size:11.5px;color:var(--muted);letter-spacing:.02em}
 .tbar-r{display:flex;align-items:center;gap:12px}
