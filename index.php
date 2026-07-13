@@ -21,7 +21,8 @@ header('Pragma: no-cache');
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23C15A34'/%3E%3Cpath%20d='M22%2015.2%2015.2%2022a1.6%201.6%200%200%201-2.3%200l-4.9-4.9a1.6%201.6%200%200%201%200-2.3l6.8-6.8a1.6%201.6%200%200%201%201.2-.5l4.4.2a1.6%201.6%200%200%201%201.5%201.5l.2%204.4a1.6%201.6%200%200%201-.5%201.2Z'%20fill='none'%20stroke='%23fff'%20stroke-width='2.1'%20stroke-linejoin='round'/%3E%3Ccircle%20cx='18.4'%20cy='13.6'%20r='1.25'%20fill='%23fff'/%3E%3C/svg%3E">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any">
+<link rel="apple-touch-icon" href="/favicon.svg">
 <meta name="theme-color" content="#C15A34">
 <title>Etsy Listing Studio</title>
 <style>
