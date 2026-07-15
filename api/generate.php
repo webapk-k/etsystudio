@@ -102,11 +102,16 @@ try {
         $signals['_source'] = in_array($signals['_source'], ['photo', 'none'], true) ? 'photo' : $signals['_source'] . '+photo';
     }
 
-    // Require SOME product signal before spending a model call. A photo counts on its own.
-    $hasText = mb_strlen((string) ($signals['text'] ?? '')) >= 60;
-    if (!$hasImage && !$hasText && empty($signals['name']) && mb_strlen((string) ($signals['description'] ?? '')) < 30 && empty($signals['specs'])) {
+    // Require a REAL product identity before spending a model call — otherwise the model would
+    // invent a product out of navigation/boilerplate text. A photo counts on its own.
+    $prodName = trim((string) ($signals['name'] ?? ''));
+    if (els_is_junk_name($prodName)) { $prodName = ''; $signals['name'] = ''; }
+    $hasDesc  = mb_strlen((string) ($signals['description'] ?? '')) >= 30;
+    $hasName  = mb_strlen($prodName) >= 8;
+    if (!$hasImage && !$hasName && !$hasDesc && empty($signals['specs'])) {
         echo json_encode([
-            'error'       => "Couldn't find product details on that page. Try a direct product URL, upload a photo, or use \"Paste page content instead\".",
+            'error'       => "Couldn't read the actual product from that page (the site blocked us or showed only menus). "
+                           . "Open the product page, press Ctrl+A then Ctrl+C, and use \"Paste page content instead\" — or upload a photo.",
             'needs_paste' => true,
         ]);
         exit;
@@ -156,6 +161,20 @@ try {
         throw new RuntimeException('The model returned an unexpected format. Please try again.');
     }
 
+    // Anti-hallucination: if the page gave us a real product name/description, the generated title
+    // must actually relate to it — otherwise the model invented an unrelated product.
+    if (!$hasImage) {
+        $src = trim($prodName . ' ' . (string) ($signals['description'] ?? '') . ' ' . mb_substr((string) ($signals['text'] ?? ''), 0, 1500));
+        if (!els_title_matches((string) ($listing['title'] ?? ''), $src)) {
+            echo json_encode([
+                'error'       => "We couldn't read that product properly, so the result didn't match it. "
+                               . "Open the product page, press Ctrl+A then Ctrl+C, and use \"Paste page content instead\" — or upload a photo.",
+                'needs_paste' => true,
+            ]);
+            exit;
+        }
+    }
+
     /* ---- server-side validation against Etsy hard limits ---- */
     $warnings = validate_listing($listing);
 
@@ -194,6 +213,45 @@ try {
 /* ================================================================== *
  *  Helpers                                                           *
  * ================================================================== */
+
+/** True when a scraped "product name" is really site boilerplate (menus, captcha, cookie text). */
+function els_is_junk_name(string $n): bool {
+    $n = trim($n);
+    if ($n === '' || mb_strlen($n) < 8) { return true; }
+    $l = mb_strtolower($n);
+    foreach (['aliexpress', 'sign in', 'log in', 'captcha', 'robot check', 'are you a human',
+              'page not found', 'access denied', 'just a moment', 'enable javascript',
+              'shopping cart', 'search results', 'verify you are human'] as $bad) {
+        if (str_contains($l, $bad)) { return true; }
+    }
+    // A real product name has at least two meaningful words.
+    $w = preg_split('~\s+~', trim(preg_replace('~[^\p{L}\p{N}\s]+~u', ' ', $n)), -1, PREG_SPLIT_NO_EMPTY);
+    return count($w) < 2;
+}
+
+/** Significant (>=4 char, non-stopword) lowercase words of a string. */
+function els_words(string $s): array {
+    $s = mb_strtolower((string) preg_replace('~[^\p{L}\p{N}\s]+~u', ' ', $s));
+    $stop = ['the','and','for','with','from','your','you','this','that','new','set','pcs','cute','gift',
+             'free','shipping','size','color','colour','style','item','best','sale','shop','store','online','buy'];
+    $out = [];
+    foreach (preg_split('~\s+~', $s, -1, PREG_SPLIT_NO_EMPTY) as $x) {
+        if (mb_strlen($x) >= 4 && !in_array($x, $stop, true)) { $out[$x] = true; }
+    }
+    return array_keys($out);
+}
+
+/**
+ * Anti-hallucination check: the generated title must share at least one real word with the source
+ * product. Stops the model inventing an unrelated product when the page text was unusable.
+ */
+function els_title_matches(string $title, string $source): bool {
+    $b = els_words($source);
+    if (count($b) < 3) { return true; }            // too little source to judge — allow
+    $a = els_words($title);
+    if (!$a) { return true; }
+    return count(array_intersect($a, $b)) > 0;
+}
 
 /** Build an AI client for a given provider. Returns [clientOrNull, errorStringOrNull]. */
 function els_make_client(string $provider, array $config): array
@@ -333,6 +391,20 @@ You are EtsyListingArchitect, a senior Etsy SEO strategist and marketplace-compl
 officer. You convert raw, scraped product signals into ONE fully Etsy-compliant listing
 that a UK+US seller can upload without edits. You output ONLY data that conforms to the
 provided JSON schema — never commentary, never markdown, never placeholders.
+
+===========================================================================
+RULE ZERO — NEVER INVENT THE PRODUCT (most important rule)
+===========================================================================
+The listing MUST describe the EXACT product named in `product_name` / the signals below.
+- `product_name` is the ground truth. Read it literally and identify the real item
+  (e.g. "…Cotton Doll Plush Werewolf … Keychain" = a small plush toy keychain — NOT a
+  print, NOT a digital download, NOT anything else).
+- NEVER substitute a different product, category or format. If the signals describe a
+  plush toy, the listing is for that plush toy — never "digital art", "wall print",
+  "template" or any other item you were not given.
+- Use ONLY facts present in the signals. Do not import ideas from other listings.
+- If the signals are thin, still stay strictly within what `product_name` says and infer
+  only the obvious (material, colour, use) — never change what the item IS.
 
 ===========================================================================
 NON-NEGOTIABLE OPERATING RULES
