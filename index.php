@@ -316,6 +316,27 @@ td.sku{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
 .scfix{margin-top:16px;padding-top:14px;border-top:1px solid var(--border)}
 .scfix .sugt{margin-bottom:8px}
 
+/* ---- image optimize ---- */
+.iodrop{display:block;position:relative;z-index:1;border:2px dashed var(--border-2);border-radius:16px;background:var(--surface);padding:34px 18px;text-align:center;cursor:pointer;transition:.15s}
+.iodrop:hover,.iodrop.over{border-color:var(--accent);background:var(--accent-weak)}
+.iodrop b{display:block;font-size:15.5px;margin:10px 0 4px}
+.iodrop svg{margin:0 auto;color:var(--accent)}
+.ioopts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 18px;margin-top:18px;position:relative;z-index:1}
+.ioopts .field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.ioopts label{font-size:11.5px;font-weight:650;color:var(--muted);letter-spacing:.02em}
+.ioopts .mksel{width:100%}
+.ioopts input[type=range]{width:100%;accent-color:var(--accent);margin:12px 0 0}
+.ioacts{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;position:relative;z-index:1}
+.iorow{display:flex;align-items:center;gap:14px;padding:12px 0;border-top:1px solid var(--border)}
+.iorow:first-child{border-top:0}
+.iothumb{width:58px;height:58px;flex:0 0 auto;border-radius:10px;border:1px solid var(--border);background:var(--surface-2) center/contain no-repeat}
+.iometa{flex:1;min-width:0}
+.iometa .nm{font-weight:650;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.iometa .sz{font-size:12.5px;color:var(--muted);margin-top:3px}
+.iometa .sz .save{color:var(--ok-ink);font-weight:650}
+.iometa .sz .bad{color:var(--err-ink)}
+@media (max-width:640px){.ioopts{grid-template-columns:1fr}.iorow{gap:10px}.iothumb{width:46px;height:46px}.iorow .btn.sm{width:auto;flex:0 0 auto;height:36px;padding:0 12px;font-size:13px}}
+
 /* ---- profit / fee calculator ---- */
 .calc{display:grid;grid-template-columns:1fr 1fr;gap:14px 22px}
 .calc .field{display:flex;flex-direction:column;gap:5px}
@@ -618,6 +639,7 @@ body.showing-landing .topbar .brand{display:flex}
     <button class="sb-item" data-view="keywords"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Keyword Research</button>
     <button class="sb-item" data-view="research"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-7"/><path d="M17 8h4v4"/></svg>Product Research</button>
     <button class="sb-item" data-view="tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>Tools</button>
+    <button class="sb-item" data-view="imgopt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>Image Optimize</button>
     <div class="sb-sep"></div>
     <button class="sb-item" data-view="plans"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 6.3 6.9.9-5 4.8 1.2 6.9L12 18.6 5.9 20.9 7.1 14l-5-4.8 6.9-.9L12 2Z"/></svg>Plans &amp; Pricing</button>
   </nav>
@@ -1212,6 +1234,7 @@ function showView(v){
   else if(v==='keywords')renderKeywords();
   else if(v==='research')renderResearch();
   else if(v==='tools')renderTools();
+  else if(v==='imgopt')renderImgOpt();
   else if(v==='plans')renderPaywall(false);
 }
 function openSidebar(){const s=$('#sidebar');if(s)s.classList.add('open');const b=$('#sbBackdrop');if(b)b.classList.add('show');}
@@ -1656,6 +1679,113 @@ function renderTools(){
   soon.innerHTML=`<div class="chead"><span class="lbl">More tools — coming soon</span></div>
     <div class="chips">${['Hashtag Generator','Category Finder','Color Thesaurus','Etsy Ads ROI','Seasonal Calendar','Spell Checker'].map(t=>`<span class="chip static">${esc(t)}</span>`).join('')}</div>`;
   stk.appendChild(soon);
+}
+
+/* image optimize — runs fully in the browser: .ai/.pdf via pdf.js, raster & SVG via canvas */
+const IO_PDF='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',IO_ZIP='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+const IO_EXT={'image/jpeg':'jpg','image/png':'png','image/webp':'webp'};
+const _js={};
+function loadJs(src){return _js[src]||(_js[src]=new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;
+  s.onerror=()=>{delete _js[src];no(new Error('Could not load the converter — check your connection.'));};document.head.appendChild(s);}));}
+const fmtKB=n=>n>=1048576?(n/1048576).toFixed(2)+' MB':Math.max(1,Math.round(n/1024))+' KB';
+let ioFiles=[],ioUrls=[];
+function renderImgOpt(){
+  ioFiles=[];const w=frame();
+  w.innerHTML=`<section class="hero-input">
+    <div class="chead" style="margin-bottom:6px"><span class="lbl">✦ Image Optimize</span></div>
+    <p class="hint" style="margin:0 0 14px 2px">Convert Adobe Illustrator (.ai), PDF, SVG, PNG, WEBP &amp; more into JPG / PNG / WEBP — resized and compressed for Etsy. Your files never leave your browser.</p>
+    <label class="iodrop" id="iodrop"><input type="file" id="iofile" multiple accept=".ai,.pdf,.svg,.png,.jpg,.jpeg,.webp,.gif,.bmp,.avif" hidden>
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg>
+      <b>Drop files here or click to choose</b><span class="muted" style="font-size:13px">AI · PDF · SVG · PNG · JPG · WEBP · GIF · BMP · AVIF</span></label>
+    <div class="ioopts">
+      <div class="field"><label for="iofmt">Convert to</label><select class="mksel" id="iofmt"><option value="image/jpeg">JPG</option><option value="image/png">PNG</option><option value="image/webp">WEBP</option></select></div>
+      <div class="field"><label for="iomax">Size</label><select class="mksel" id="iomax"><option value="2000">Etsy recommended (2000px)</option><option value="3000">Large (3000px)</option><option value="1500">Medium (1500px)</option><option value="1000">Small (1000px)</option><option value="0">Original size</option></select></div>
+      <div class="field"><label for="ioq">Quality — <span id="ioqv">85%</span></label><input type="range" id="ioq" min="40" max="100" value="85"></div>
+    </div>
+    <div class="ioacts"><button class="btn primary" id="iogo" disabled>Convert</button>
+      <button class="btn ghost" id="iozip" style="display:none">Download all (.zip)</button><button class="btn ghost" id="ioclr" style="display:none">Clear</button></div>
+  </section>
+  <div id="ioout" style="margin-top:20px"></div>`;
+  const drop=$('#iodrop'),inp=$('#iofile');
+  const add=fl=>{for(const f of fl)ioFiles.push({file:f,out:null,err:''});inp.value='';ioDraw();};
+  inp.onchange=()=>add(inp.files);
+  ['dragenter','dragover'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('over');}));
+  ['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('over');}));
+  drop.addEventListener('drop',ev=>add(ev.dataTransfer.files));
+  const syncQ=()=>{const png=$('#iofmt').value==='image/png';$('#ioq').disabled=png;$('#ioqv').textContent=png?'lossless':$('#ioq').value+'%';};
+  $('#ioq').oninput=syncQ;$('#iofmt').onchange=syncQ;
+  $('#iogo').onclick=ioRun;$('#iozip').onclick=ioZip;
+  $('#ioclr').onclick=()=>{ioFiles=[];ioDraw();};
+}
+function ioDraw(){
+  ioUrls.forEach(u=>URL.revokeObjectURL(u));ioUrls=[];
+  const out=$('#ioout');if(!out)return;
+  $('#iogo').disabled=!ioFiles.length;$('#ioclr').style.display=ioFiles.length?'':'none';
+  $('#iozip').style.display=ioFiles.filter(x=>x.out).length>1?'':'none';
+  if(!ioFiles.length){out.innerHTML='';return;}
+  out.innerHTML=`<section class="card pad"><div class="chead"><span class="lbl">Files<span class="n">${ioFiles.length}</span></span></div><div id="iolist"></div></section>`;
+  const list=$('#iolist');
+  ioFiles.forEach((x,i)=>{
+    const r=document.createElement('div');r.className='iorow';
+    const src=x.out?x.out.blob:(/^image\/(?!svg)/.test(x.file.type)?x.file:null);
+    let thumb='';if(src){const u=URL.createObjectURL(src);ioUrls.push(u);thumb=`style="background-image:url('${u}')"`;}
+    let sz=fmtKB(x.file.size);
+    if(x.err)sz+=` · <span class="bad">${esc(x.err)}</span>`;
+    else if(x.busy)sz+=' · converting…';
+    else if(x.out){const d=Math.round((1-x.out.blob.size/x.file.size)*100);
+      sz+=` → ${fmtKB(x.out.blob.size)} · ${x.out.w}×${x.out.h}px · ${x.out.vec?'<span class="save">converted from vector</span>':d>0?`<span class="save">${d}% smaller</span>`:`<span class="bad">${-d}% larger</span>`}`;}
+    r.innerHTML=`<div class="iothumb" ${thumb}></div><div class="iometa"><div class="nm">${esc(x.out?x.out.name:x.file.name)}</div><div class="sz">${sz}</div></div>
+      ${x.out?'<button class="btn primary sm" data-a="dl">Download</button>':''}${x.busy?'':'<button class="icobtn" data-a="rm" title="Remove">&times;</button>'}`;
+    const rm=r.querySelector('[data-a=rm]');if(rm)rm.onclick=()=>{ioFiles.splice(i,1);ioDraw();};
+    const b=r.querySelector('[data-a=dl]');if(b)b.onclick=()=>dl(x.out.name,x.out.blob.type,x.out.blob);
+    list.appendChild(r);
+  });
+}
+async function ioCanvas(file,max){
+  const head=new Uint8Array(await file.slice(0,5).arrayBuffer()),isPdf=String.fromCharCode(...head)==='%PDF-';
+  if(/\.(ai|pdf)$/i.test(file.name)&&!isPdf)throw new Error(/\.ai$/i.test(file.name)?'No PDF data in this .ai — re-save it in Illustrator with “Create PDF Compatible File” ticked':'Not a valid PDF');
+  if(isPdf){
+    await loadJs(IO_PDF);const lib=window.pdfjsLib;lib.GlobalWorkerOptions.workerSrc=IO_PDF.replace('pdf.min.js','pdf.worker.min.js');
+    const doc=await lib.getDocument({data:await file.arrayBuffer()}).promise,pg=await doc.getPage(1),v1=pg.getViewport({scale:1});
+    const vp=pg.getViewport({scale:Math.min(10,(max||2400)/Math.max(v1.width,v1.height))});  // vector art: render at the target size
+    const c=document.createElement('canvas');c.width=Math.round(vp.width);c.height=Math.round(vp.height);
+    await pg.render({canvasContext:c.getContext('2d'),viewport:vp,background:'rgba(0,0,0,0)'}).promise;doc.destroy();return c;
+  }
+  const url=URL.createObjectURL(file);
+  try{
+    const img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>no(new Error('Could not read this image'));i.src=url;});
+    const svg=/svg/.test(file.type)||/\.svg$/i.test(file.name);
+    let w=img.naturalWidth,h=img.naturalHeight;if(!w||!h){w=h=max||2000;}
+    const s=max&&(svg||Math.max(w,h)>max)?max/Math.max(w,h):1;  // shrink rasters, never upscale them; SVG scales freely
+    const c=document.createElement('canvas');c.width=Math.round(w*s);c.height=Math.round(h*s);
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);return c;
+  }finally{URL.revokeObjectURL(url);}
+}
+function ioEncode(src,mime,q){
+  const c=document.createElement('canvas');c.width=src.width;c.height=src.height;const x=c.getContext('2d');
+  if(mime==='image/jpeg'){x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);}  // JPG has no transparency
+  x.drawImage(src,0,0);
+  return new Promise((ok,no)=>c.toBlob(b=>!b?no(new Error('Encoding failed')):b.type!==mime?no(new Error('Your browser can’t create '+IO_EXT[mime].toUpperCase()+' — pick JPG')):ok(b),mime,q));
+}
+async function ioRun(){
+  const mime=$('#iofmt').value,max=+$('#iomax').value,q=+$('#ioq').value/100,go=$('#iogo');
+  go.disabled=true;go.textContent='Converting…';
+  for(const x of ioFiles){x.out=null;x.err='';x.busy=true;}ioDraw();go.disabled=true;
+  for(const x of ioFiles){
+    try{const c=await ioCanvas(x.file,max),blob=await ioEncode(c,mime,q);
+      x.out={blob,w:c.width,h:c.height,vec:/\.(ai|pdf|svg)$/i.test(x.file.name),name:x.file.name.replace(/\.[^.]+$/,'')+'.'+IO_EXT[mime]};}
+    catch(e){x.err=e.message||'Conversion failed';}
+    x.busy=false;ioDraw();go.disabled=true;
+  }
+  go.disabled=!ioFiles.length;go.textContent='Convert';
+}
+async function ioZip(){
+  const b=$('#iozip');b.disabled=true;b.textContent='Zipping…';
+  try{await loadJs(IO_ZIP);const z=new JSZip(),seen={};
+    ioFiles.filter(x=>x.out).forEach(x=>{let n=x.out.name;if(seen[n])n=n.replace(/(\.\w+)$/,'-'+(++seen[n])+'$1');else seen[n]=1;z.file(n,x.out.blob);});
+    dl('optimized-images.zip','application/zip',await z.generateAsync({type:'blob'}));}
+  catch(e){alert(e.message);}
+  b.disabled=false;b.textContent='Download all (.zip)';
 }
 
 /* run boot AFTER the whole script has parsed, so every const (kwListGet, CAL_EVENTS…) is initialised */
