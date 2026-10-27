@@ -137,6 +137,8 @@ try {
                  . "CATEGORY_HINT: " . ($category !== '' ? $category : '(none)') . "\n"
                  . $makerRule . "\n"
                  . $photoRule . "\n"
+                 . "TODAY: " . date('j F Y') . "\n"
+                 . "UPCOMING SEASONS (next ~10 weeks — use only those that fit this product): " . els_upcoming_seasons() . "\n"
                  . "Generate one Etsy-compliant listing for the TARGET_MARKET above using ONLY the scraped signals below. "
                  . "Use en-GB spelling if the market is UK or UK+US, en-US if US only. Infer any missing attribute from the "
                  . "category and remaining signals — never leave a field empty and never use placeholders. If CATEGORY_HINT is "
@@ -176,6 +178,8 @@ try {
     }
 
     /* ---- server-side validation against Etsy hard limits ---- */
+    $listing['title'] = els_fix_title((string) ($listing['title'] ?? ''));
+    $listing['tags'] = els_fix_tags((array) ($listing['tags'] ?? []), (array) ($listing['suggestions']['extra_keywords'] ?? []));
     $warnings = validate_listing($listing);
 
     // count this successful listing (per-user if logged in) + log to history
@@ -228,6 +232,63 @@ function els_is_junk_name(string $n): bool {
     // A real product name has at least two meaningful words.
     $w = preg_split('~\s+~', trim(preg_replace('~[^\p{L}\p{N}\s]+~u', ' ', $n)), -1, PREG_SPLIT_NO_EMPTY);
     return count($w) < 2;
+}
+
+/** Keep the title to <=14 words / <=140 chars by dropping trailing ", " phrases (the primary keyword leads). */
+function els_fix_title(string $t): string {
+    $parts = array_values(array_filter(array_map('trim', preg_split('~\s*[,|]\s*~', $t)), 'strlen'));
+    $words = fn(array $p) => count(preg_split('~\s+~', implode(' ', $p), -1, PREG_SPLIT_NO_EMPTY));
+    while (count($parts) > 2 && ($words($parts) > 14 || mb_strlen(implode(', ', $parts)) > 140)) { array_pop($parts); }
+    return count($parts) > 1 ? implode(', ', $parts) : $t;
+}
+
+/**
+ * Enforce Etsy's tag rules the model sometimes misses: <=20 chars, no duplicates, 13 tags.
+ * Over-long tags are replaced by unused extra_keywords that fit, else trimmed at a word boundary.
+ */
+function els_fix_tags(array $tags, array $extra): array {
+    $norm = fn($t) => trim(preg_replace('~\s+~', ' ', preg_replace('~[^\p{L}\p{N}\s-]+~u', '', mb_strtolower((string) $t))));
+    $ok = []; $long = [];
+    foreach ($tags as $t) {
+        $t = $norm($t);
+        if ($t === '' || in_array($t, $ok, true)) { continue; }
+        if (mb_strlen($t) <= 20) { $ok[] = $t; } else { $long[] = $t; }
+    }
+    foreach ($extra as $e) {
+        if (count($ok) >= 13) { break; }
+        $e = $norm($e);
+        if ($e !== '' && mb_strlen($e) <= 20 && str_contains($e, ' ') && !in_array($e, $ok, true)) { $ok[] = $e; }
+    }
+    foreach ($long as $t) {
+        if (count($ok) >= 13) { break; }
+        $cut = '';
+        foreach (explode(' ', $t) as $w) {
+            if (mb_strlen(trim($cut . ' ' . $w)) > 20) { break; }
+            $cut = trim($cut . ' ' . $w);
+        }
+        if ($cut !== '' && str_contains($cut, ' ') && !in_array($cut, $ok, true)) { $ok[] = $cut; }
+    }
+    return array_slice($ok, 0, 13);
+}
+
+/** UK + US seasonal buying moments for this month and next, as tag-ready phrases. */
+function els_upcoming_seasons(): string {
+    $by = [
+        1  => ['valentines gift', 'galentines gift', 'winter', 'lunar new year'],
+        2  => ['valentines gift', 'mothers day gift (UK, March)', 'st patricks day', 'spring'],
+        3  => ['mothers day gift (UK)', 'easter gift', 'easter basket', 'st patricks day', 'spring'],
+        4  => ['easter gift', 'mothers day gift (US, May)', 'spring', 'wedding season'],
+        5  => ['mothers day gift (US)', 'graduation gift', 'fathers day gift', 'wedding season', 'summer'],
+        6  => ['fathers day gift', 'graduation gift', 'wedding season', 'summer', '4th of july'],
+        7  => ['4th of july', 'summer', 'back to school', 'teacher gift'],
+        8  => ['back to school', 'teacher gift', 'autumn / fall', 'halloween'],
+        9  => ['autumn / fall', 'halloween', 'thanksgiving (US)', 'christmas gift (early shoppers)'],
+        10 => ['halloween', 'thanksgiving (US)', 'diwali', 'christmas gift', 'stocking filler (UK) / stocking stuffer (US)'],
+        11 => ['christmas gift', 'stocking filler (UK) / stocking stuffer (US)', 'secret santa gift', 'hanukkah gift', 'thanksgiving (US)', 'winter'],
+        12 => ['christmas gift', 'stocking filler (UK) / stocking stuffer (US)', 'secret santa gift', 'new year', 'winter', 'valentines gift (early)'],
+    ];
+    $m = (int) date('n');
+    return implode(', ', array_values(array_unique(array_merge($by[$m], $by[$m % 12 + 1]))));
 }
 
 /** Significant (>=4 char, non-stopword) lowercase words of a string. */
@@ -348,7 +409,7 @@ function gemini_shape_hint(): string
         . "{\n"
         . '  "title": string (<=140 chars),' . "\n"
         . '  "tags": array of EXACTLY 13 lowercase strings (each <=20 chars),' . "\n"
-        . '  "description": string,' . "\n"
+        . '  "description": string (simple words, keyword-rich opening, then emoji section headers with "• " bullet lines, separated by \n),' . "\n"
         . '  "materials": array of strings (<=13),' . "\n"
         . '  "taxonomy_path": string (breadcrumb joined by " > "),' . "\n"
         . '  "attributes": { "who_made": one of ["i_did","someone_else","collective"], "what_is_it": one of ["finished_product","supply_or_tool"], "when_made": one of ["made_to_order","2020_2026","2010_2019","2007_2009","2000_2006","1990s","1980s","1970s","1960s","1950s","1940s","1930s","1920s","1910s","1900s","1800s","1700s","before_1700"], "primary_colour": string, "secondary_colour": string or "none", "occasion": string or "none", "holiday": string or "none", "style": string or "none" },' . "\n"
@@ -421,40 +482,86 @@ NON-NEGOTIABLE OPERATING RULES
 4. Output must satisfy EVERY Etsy limit below. Self-check silently before finalising.
 
 ===========================================================================
+KEYWORD RESEARCH FIRST (do silently before writing title, tags, description)
+===========================================================================
+Pick, for THIS exact product:
+- PRIMARY keyword: the 2-4 word phrase UK AND US buyers most often type to find it
+  (e.g. "personalised name necklace"). It is what the item IS, in buyer words.
+- 4-6 SUPER keywords: the next-highest-volume buyer phrases — synonyms of the product type,
+  material + product, style + product, recipient + product (e.g. "gold bar necklace",
+  "dainty name necklace", "bridesmaid necklace", "gift for her").
+- UK vs US wording: where the two markets spell or say it differently (personalised /
+  personalized, jewellery / jewelry, colour / color, mum / mom, stocking filler / stocking
+  stuffer, autumn / fall, holiday / vacation), cover BOTH when TARGET_MARKET is UK+US — one
+  variant in the title, the other in the tags. For a single market use only its wording.
+- SEASONAL keywords: from the UPCOMING SEASONS list in the user message, choose the ones
+  that genuinely fit this product (a mug fits Christmas & secret santa; a beach bag does not
+  fit Christmas). Never force an unrelated season.
+Use these same researched phrases across title, tags and description so they reinforce
+each other — but never stuff.
+
+===========================================================================
 TITLE  (field: title)
 ===========================================================================
-- Maximum 140 characters INCLUDING spaces. Aim for 110-140 to maximise keyword surface.
-- FRONT-LOAD the 2-4 highest-value buyer-search keywords in the first ~40 characters,
-  because Etsy weights early words and mobile truncates the rest.
-- Human-readable phrase order, not a comma-dump of keywords. A little natural chunking
-  with "," or " | " is fine; do not stuff.
-- FORBIDDEN: ALL CAPS words, keyword stuffing (same word 3+ times), promotional claims
-  ("SALE", "BEST", "#1", "FREE SHIPPING", "100% guaranteed", "cheapest"), emoji, and any
-  trademark you are not authorised to use (no "Disney", "Nike", "Stanley", team names,
-  character names, etc. — for dropshipped goods assume NOT authorised).
-- Include at least one occasion/recipient or use-case keyword when natural.
+- Maximum 140 characters INCLUDING spaces; aim for 70-120 characters and 14 WORDS OR FEWER
+  (Etsy's own guidance — long keyword-stuffed titles now rank and convert worse). COUNT the
+  words before finalising; if over 14, drop the weakest phrase.
+- START with the PRIMARY keyword (the exact product, in buyer words) in the first ~40
+  characters — Etsy weights early words and mobile shows only the start.
+- Then 1-2 SUPER keywords (material / style / key feature) and ONE recipient, occasion or
+  seasonal phrase if it fits, e.g.
+  "Personalised Name Necklace, Dainty Gold Bar Necklace, Christmas Gift for Her".
+- Readable phrase chunks separated by ", " — not a comma-dump. Each word at most twice.
+- FORBIDDEN: ALL CAPS words, promotional claims ("SALE", "BEST", "#1", "FREE SHIPPING",
+  "100% guaranteed", "cheapest"), emoji, other-marketplace names, the word "handmade" when
+  the MAKER DECLARATION says the seller resells, and ANY trademark/brand/character/celebrity/
+  team name (no "Disney", "Nike", "Stanley", "Taylor Swift"…) — assume NOT authorised.
 
 ===========================================================================
-TAGS  (field: tags) — EXACTLY 13
+TAGS  (field: tags) — EXACTLY 13, all Etsy-policy-safe
 ===========================================================================
-- Output EXACTLY 13 tags. Not 12, not 14.
-- Each tag <= 20 characters INCLUDING spaces. Count spaces.
-- lowercase only.
-- Prefer MULTI-WORD long-tail phrases (2-3 words) that mirror real search queries.
-- Do not duplicate a whole tag, and avoid repeating the SAME word across many tags.
-  Spread distinct concepts: product type, materials, style, colour, recipient, occasion,
-  room/use, benefit. No punctuation except spaces and hyphens. No "#". No trademarks.
+- EXACTLY 13 tags. Each <= 20 characters INCLUDING spaces (count them). lowercase.
+- Every tag is a MULTI-WORD (2-3 word) phrase a real buyer types — no single-word tags.
+- Build the 13 like this (adapt to the product):
+  * 4 product tags: primary keyword + product-type synonyms (incl. the other UK/US spelling)
+  * 2 material / style / colour tags (e.g. "sterling silver ring", "boho wall art")
+  * 2 recipient tags (e.g. "gift for her", "gift for mum", "dad birthday gift")
+  * 2-3 SEASONAL tags from UPCOMING SEASONS that truly fit (e.g. "christmas gift",
+    "stocking stuffer", "secret santa gift", "valentines gift")
+  * 1-2 niche / use-case long-tail tags (e.g. "office desk decor", "bridesmaid proposal")
+- Do NOT repeat a whole tag, and do not repeat the exact title phrase word-for-word in
+  every tag — spread distinct concepts so the listing is found by more searches.
+- POLICY-SAFE: no trademarks / brands / characters / celebrities / teams, no "dupe",
+  "inspired by", "replica", no medical or health claims ("anxiety relief", "healing"), no
+  "handmade" for resold items, no "sale" / "free shipping" / "cheap", no other marketplace
+  names. Only letters, numbers, spaces and hyphens.
 
 ===========================================================================
-DESCRIPTION  (field: description)
+DESCRIPTION  (field: description) — simple, scannable, with emojis
 ===========================================================================
-- FIRST SENTENCE is an SEO anchor: it must naturally contain the primary product keyword
-  phrase plus 1-2 secondary search terms, readable as a real sentence.
-- Then 2-5 short scannable paragraphs/lines covering: what it is, key materials &
-  dimensions, who it is for / occasions, care or usage notes, and the variation options
-  available. en-GB spelling by default (en-US if market = US only).
-- Honest, benefit-led. No fake scarcity, no external links, no request to contact
-  off-Etsy, no other-marketplace names, no trademark misuse.
+Write in simple, friendly, everyday English (short sentences a 12-year-old understands).
+en-GB spelling for UK or UK+US, en-US for US only. Use "\n" line breaks. Layout:
+
+1. OPENING (1-2 sentences, NO emoji before the first words): the VERY FIRST WORDS are the
+   PRIMARY keyword (e.g. "Personalised name necklace, hand stamped…") — never open with
+   "Discover", "Introducing", "Welcome", "Our" or "This beautiful". It
+   and naturally includes 1-2 SUPER keywords in the first 160 characters — this text shows
+   in Etsy & Google search results.
+2. Then these short sections, each a header line starting with ONE emoji, followed by 2-4
+   bullet lines starting with "• ":
+   ✨ WHY YOU'LL LOVE IT — 3 benefit bullets that weave in the other SUPER keywords
+   📏 DETAILS — material, size/dimensions, colour, what's included (only facts from the
+      signals; never invent sizes or materials)
+   🎁 PERFECT GIFT FOR — recipients + the SEASONAL occasions chosen above
+   🧼 CARE — 1-2 care/usage lines (skip this section for digital items)
+   🛒 HOW TO ORDER — pick options / add personalisation in the box (only if variations or
+      personalisation exist)
+   💬 QUESTIONS? — "Send us a message on Etsy — we're happy to help!"
+- Use each SUPER keyword at most twice in the whole description. About 6-10 emojis total;
+  never emoji spam, never emojis inside keywords.
+- Honest only: no fake scarcity, no "best on Etsy", no external links, emails, social handles
+  or off-Etsy contact, no other-marketplace names, no trademarks, no medical claims, no
+  shipping-time promises.
 
 ===========================================================================
 MATERIALS  (field: materials) — up to 13
@@ -593,8 +700,10 @@ of Etsy. Do NOT fabricate exact live numbers or name specific real shops/listing
 ===========================================================================
 FINAL SELF-VERIFICATION (do silently, then emit JSON only)
 ===========================================================================
-title <= 140, front-loaded, no caps/promo/TM · exactly 13 tags each <= 20 chars lowercase
-multi-word no dup words · description first sentence carries primary+secondary keywords ·
+title <= 140 chars & <= 14 words, starts with the primary keyword, no caps/promo/TM ·
+exactly 13 tags each <= 20 chars lowercase multi-word, includes fitting seasonal + UK/US
+variant tags, all policy-safe · description opens with primary+super keywords, simple words,
+emoji section headers with "• " bullets ·
 <= 13 materials · taxonomy leaf chosen · attributes valid enums · who/what/when correct for
 a dropshipped finished product · GBP+USD retail with real margin · every variation row
 complete · policy_check reflects reality · every field specific, non-placeholder, unique.
