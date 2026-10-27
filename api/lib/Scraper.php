@@ -53,8 +53,15 @@ class Scraper
                 $resp = $this->fetch($url);
                 $utf8 = $this->toUtf8($resp['body'], $resp['contentType']);
             }
+            // A real "page not found" is not a block — don't retry it or turn its error page into a product.
+            if ($resp['ok'] && in_array($resp['status'], [404, 410], true)) {
+                return $this->notFoundResult($resp['finalUrl'] ?: $url);
+            }
             if (!$this->looksBlocked($resp, $utf8)) {
                 $data = $this->extractAll($utf8, $resp['finalUrl']);
+                if ($this->isNotFoundName((string) ($data['name'] ?? ''))) {
+                    return $this->notFoundResult($resp['finalUrl'] ?: $url);
+                }
                 $data['_source'] = !empty($resp['insecure']) ? 'fetched-insecure' : 'fetched';
                 return $data;
             }
@@ -90,6 +97,23 @@ class Scraper
                            . "Open the product page in your browser, press Ctrl+A then Ctrl+C to copy it, "
                            . "and paste it into \"Paste page content instead\" — that always works.",
             'sourceUrl'   => $resp['finalUrl'] ?? $url,
+        ];
+    }
+
+    /** True when a page's title/heading is an error page ("404", "Page not found", "Oops"…). */
+    private function isNotFoundName(string $name): bool
+    {
+        return (bool) preg_match('~\b(404|410)\b|page not found|not found|(?:doesn.?t|does not|no longer) exists?|no longer available|could ?n.?o?t be found|can.?t be found|^\s*oops\b|^\s*error\b~i', $name);
+    }
+
+    private function notFoundResult(string $url): array
+    {
+        return [
+            '_source'     => 'not-found',
+            '_needsPaste' => true,
+            '_message'    => "That link opens a \"page not found\" (404) page — the product may have been removed, or the link is wrong. "
+                           . "Check the link and try again, or upload a product photo instead.",
+            'sourceUrl'   => $url,
         ];
     }
 

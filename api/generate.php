@@ -220,10 +220,11 @@ function els_is_junk_name(string $n): bool {
     if ($n === '' || mb_strlen($n) < 8) { return true; }
     $l = mb_strtolower($n);
     foreach (['aliexpress', 'sign in', 'log in', 'captcha', 'robot check', 'are you a human',
-              'page not found', 'access denied', 'just a moment', 'enable javascript',
+              'page not found', 'not found', 'no longer available', 'does not exist', "doesn't exist", 'access denied', 'just a moment', 'enable javascript',
               'shopping cart', 'search results', 'verify you are human'] as $bad) {
         if (str_contains($l, $bad)) { return true; }
     }
+    if (preg_match('~\b(404|410)\b|^\s*(oops|error)\b~', $l)) { return true; }   // "404", "Oops!", "Error 500"
     // A real product name has at least two meaningful words.
     $w = preg_split('~\s+~', trim(preg_replace('~[^\p{L}\p{N}\s]+~u', ' ', $n)), -1, PREG_SPLIT_NO_EMPTY);
     return count($w) < 2;
