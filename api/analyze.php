@@ -56,7 +56,7 @@ try {
             if ($name === '') { throw new RuntimeException('Paste a full Etsy listing URL (…/listing/ID/product-name) — or use "Paste listing details" for a full audit.'); }
             $fromTitle = true;
         } else {
-            $scraper = new Scraper(trim((string) ($config['scraper_api_key'] ?? '')));
+            $scraper = new Scraper(trim((string) ($config['scraper_api_key'] ?? '')), (string) ($config['jina_api_key'] ?? ''));
             $signals = $scraper->scrape($url);
             if (empty($signals['_needsPaste'])) { $name = trim((string) ($signals['name'] ?? '')); $text = trim((string) ($signals['text'] ?? '')); }
             if ($name === '' && mb_strlen($text) < 40) {

@@ -13,10 +13,12 @@ class Scraper
 {
     private ?string $caBundle = null;
     private string $scraperApiKey = '';
+    private string $jinaApiKey = '';
 
-    public function __construct(string $scraperApiKey = '')
+    public function __construct(string $scraperApiKey = '', string $jinaApiKey = '')
     {
         $this->scraperApiKey = trim($scraperApiKey);
+        $this->jinaApiKey    = trim($jinaApiKey);
     }
 
     /**
@@ -278,6 +280,11 @@ class Scraper
                     usleep(400000);
                     continue;
                 }
+                // This URL variant got an error / maintenance page — try the next variant instead.
+                if (preg_match('~^\s*Title:\s*(.*)$~mi', $body, $tm)
+                    && ($this->isNotFoundName($tm[1]) || preg_match('~maintaining|maintenance|^\s*aliexpress(\.com)?\s*$~i', $tm[1]))) {
+                    continue 2;
+                }
                 return $body;
             }
         }
@@ -289,6 +296,11 @@ class Scraper
     {
         $list = [$url];
         $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+        // AliExpress search/ad links carry huge tracking params (pdp_npi, pdp_ext_f…) that make
+        // AliExpress answer "404 page" — the bare item URL by ID is far more reliable.
+        if (str_contains($host, 'aliexpress.') && preg_match('~/item/(\d+)\.html~', $url, $m)) {
+            return ["https://www.aliexpress.com/item/{$m[1]}.html", "https://m.aliexpress.com/item/{$m[1]}.html", $url];
+        }
         // AliExpress desktop is served a captcha even through Jina, but the MOBILE site is not —
         // so for AliExpress we try m.aliexpress.com FIRST (any region → the universal mobile host).
         if (str_contains($host, 'aliexpress.') && !str_starts_with($host, 'm.')) {
@@ -311,7 +323,9 @@ class Scraper
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => 0,
             CURLOPT_USERAGENT      => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/125.0 Safari/537.36',
-            CURLOPT_HTTPHEADER     => ['Accept: text/plain', 'X-Return-Format: markdown'],
+            // an (optional, free) Jina key lifts the keyless ~20 requests/min limit
+            CURLOPT_HTTPHEADER     => array_merge(['Accept: text/plain', 'X-Return-Format: markdown'],
+                                        $this->jinaApiKey !== '' ? ['Authorization: Bearer ' . $this->jinaApiKey] : []),
         ]);
         $body   = curl_exec($ch);
         $errno  = curl_errno($ch);

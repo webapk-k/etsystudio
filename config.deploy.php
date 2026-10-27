@@ -32,6 +32,9 @@ return [
 
     'scraper_api_key'    => getenv('SCRAPER_API_KEY') ?: '',
 
+    // Optional free key from jina.ai — makes AliExpress/Amazon link reading more reliable (higher rate limit)
+    'jina_api_key'       => getenv('JINA_API_KEY') ?: '',
+
     // Etsy Open API v3 key for the Policy Violation shop scan — "keystring:shared_secret" (developer.etsy.com)
     'etsy_api_key'       => getenv('ETSY_API_KEY') ?: '',
 ];

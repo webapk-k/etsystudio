@@ -77,7 +77,7 @@ try {
     /* ---- scrape (only when a link or pasted content was given) ---- */
     $signals = null;
     if ($url !== '' || $html !== '') {
-        $scraper = new Scraper(trim((string) ($config['scraper_api_key'] ?? '')));
+        $scraper = new Scraper(trim((string) ($config['scraper_api_key'] ?? '')), (string) ($config['jina_api_key'] ?? ''));
         $signals = $scraper->scrape($url, $html !== '' ? $html : null);
         if (!empty($signals['_needsPaste'])) {
             // If a photo was ALSO uploaded, don't fail — fall through and use the photo instead.
