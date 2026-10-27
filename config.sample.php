@@ -55,4 +55,9 @@ return [
     // These sites block server-side fetching. Get a FREE key at https://www.scraperapi.com
     // and paste it here to fetch them automatically. Leave empty to use "Paste page content".
     'scraper_api_key' => '',
+
+    // Policy Violation → "Scan shop" reads a shop's active listings via the Etsy Open API v3.
+    // Create an app at https://www.etsy.com/developers and paste "keystring:shared_secret" here.
+    // Leave empty to use the listings-CSV upload instead.
+    'etsy_api_key' => '',
 ];

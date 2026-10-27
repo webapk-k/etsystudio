@@ -337,6 +337,42 @@ td.sku{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
 .iometa .sz .bad{color:var(--err-ink)}
 @media (max-width:640px){.ioopts{grid-template-columns:1fr}.iorow{gap:10px}.iothumb{width:46px;height:46px}.iorow .btn.sm{width:auto;flex:0 0 auto;height:36px;padding:0 12px;font-size:13px}}
 
+/* ---- policy violation scanner ---- */
+.pvor{display:flex;align-items:center;gap:12px;margin:16px 0 12px;color:var(--faint);font-size:12px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;position:relative;z-index:1}
+.pvor::before,.pvor::after{content:"";flex:1;height:1px;background:var(--border)}
+.pvcsv{display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:relative;z-index:1}
+.pvcsv .hint{margin:0;flex:1;min-width:220px}
+.pvstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.pvstat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px}
+.pvstat b{display:block;font-size:26px;line-height:1.1;margin-top:4px;font-variant-numeric:tabular-nums}
+.pvstat span{font-size:12px;font-weight:650;color:var(--muted)}
+.pvstat.red{background:var(--err-bg);border-color:transparent}.pvstat.red b,.pvstat.red span{color:var(--err-ink)}
+.pvstat.amber{background:var(--warn-bg);border-color:transparent}.pvstat.amber b,.pvstat.amber span{color:var(--warn-ink)}
+.pvstat.ok{background:var(--ok-bg);border-color:transparent}.pvstat.ok b,.pvstat.ok span{color:var(--ok-ink)}
+.pvprog{height:6px;border-radius:99px;background:var(--sunken);overflow:hidden;margin:4px 0 6px}
+.pvprog i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.pvbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.pvbar .muted{font-size:12.5px;flex:1;min-width:180px}
+.pvrow{display:flex;gap:14px;padding:14px;border:1px solid var(--border);border-left:4px solid var(--border-2);border-radius:12px;margin-top:10px;background:var(--surface)}
+.pvrow.red{border-left-color:var(--err);background:var(--err-bg)}
+.pvrow.amber{border-left-color:var(--warn)}
+.pvrow.clean{border-left-color:var(--ok)}
+.pvimg{width:64px;height:64px;flex:0 0 auto;border-radius:10px;background:var(--surface-2) center/cover no-repeat;border:1px solid var(--border)}
+.pvbody{flex:1;min-width:0}
+.pvtitle{display:flex;align-items:flex-start;gap:10px;justify-content:space-between}
+.pvtitle a,.pvtitle span.t{font-weight:650;font-size:14px;color:var(--text);text-decoration:none;overflow-wrap:anywhere}
+.pvtitle a:hover{color:var(--accent)}
+.pvpill{flex:0 0 auto;font-size:11px;font-weight:750;letter-spacing:.04em;text-transform:uppercase;border-radius:99px;padding:3px 10px;color:#fff;background:var(--faint)}
+.pvpill.red{background:var(--err)}.pvpill.amber{background:var(--warn)}.pvpill.clean{background:var(--ok)}
+.pviss{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:7px}
+.pviss li{font-size:13px;line-height:1.45}
+.pviss .pol{font-size:11px;font-weight:700;border-radius:6px;padding:1px 7px;margin-right:6px;white-space:nowrap}
+.pviss .red .pol{background:var(--err);color:#fff}.pviss .amber .pol{background:var(--warn);color:#fff}
+.pviss q{font-weight:650;color:var(--err-ink);quotes:"“" "”"}
+.pviss .fix{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.pvsafe{font-size:12.5px;color:var(--ok-ink);margin-top:6px}
+@media (max-width:640px){.pvstats{grid-template-columns:repeat(2,minmax(0,1fr))}.pvrow{padding:12px;gap:10px}.pvimg{width:48px;height:48px}}
+
 /* ---- profit / fee calculator ---- */
 .calc{display:grid;grid-template-columns:1fr 1fr;gap:14px 22px}
 .calc .field{display:flex;flex-direction:column;gap:5px}
@@ -640,6 +676,7 @@ body.showing-landing .topbar .brand{display:flex}
     <button class="sb-item" data-view="research"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-7"/><path d="M17 8h4v4"/></svg>Product Research</button>
     <button class="sb-item" data-view="tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>Tools</button>
     <button class="sb-item" data-view="imgopt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>Image Optimize</button>
+    <button class="sb-item" data-view="policy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Policy Violation</button>
     <div class="sb-sep"></div>
     <button class="sb-item" data-view="plans"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 6.3 6.9.9-5 4.8 1.2 6.9L12 18.6 5.9 20.9 7.1 14l-5-4.8 6.9-.9L12 2Z"/></svg>Plans &amp; Pricing</button>
   </nav>
@@ -1235,6 +1272,7 @@ function showView(v){
   else if(v==='research')renderResearch();
   else if(v==='tools')renderTools();
   else if(v==='imgopt')renderImgOpt();
+  else if(v==='policy')renderPolicy();
   else if(v==='plans')renderPaywall(false);
 }
 function openSidebar(){const s=$('#sidebar');if(s)s.classList.add('open');const b=$('#sbBackdrop');if(b)b.classList.add('show');}
@@ -1786,6 +1824,184 @@ async function ioZip(){
     dl('optimized-images.zip','application/zip',await z.generateAsync({type:'blob'}));}
   catch(e){alert(e.message);}
   b.disabled=false;b.textContent='Download all (.zip)';
+}
+
+/* policy violation — instant rule checks + AI review (api/policy.php) of every listing in a shop */
+// [severity, policy, pattern, what's wrong, how to fix]
+const PV_RULES=[
+  ['red','Intellectual Property',/\b(disney|pixar|marvel|avengers|star wars|mandalorian|baby yoda|grogu|harry potter|hogwarts|gryffindor|slytherin|pok[eé]mon|pikachu|nintendo|super mario|zelda|hello kitty|sanrio|kuromi|barbie|lego|bluey|paw patrol|peppa pig|mickey mouse|minnie mouse|winnie the pooh|lilo (?:and|&) stitch|encanto|spider-?man|batman|superman|wonder woman|dc comics|looney tunes|bugs bunny|scooby[- ]doo|sesame street|care bears|snoopy|grinch|sailor moon|naruto|one piece|dragon ball|studio ghibli|totoro|squishmallows?|jellycat|stanley (?:cup|tumbler|quencher)|yeti (?:cooler|tumbler|rambler)|taylor swift|swifties?|eras tour|nfl|nba|mlb|nhl|super bowl|olympics|coca[- ]cola|starbucks|harley[- ]davidson|john deere)\b/i,
+    'Trademarked brand, character or celebrity name.','Remove the name from the title, tags and description. Sell only your own original design.'],
+  ['red','Intellectual Property',/\b(louis vuitton|gucci|chanel|prada|herm[eè]s|dior|versace|fendi|balenciaga|burberry|rolex|cartier|tiffany & co|nike|adidas|air jordan|off-white|yeezy)\b/i,
+    'Designer or luxury brand name. Etsy removes these as counterfeit risks.','Remove the brand name and describe the style in generic words.'],
+  ['red','Intellectual Property',/\b(replicas?|knock-?offs?|counterfeit|fake (?:designer|brand|gucci|lv|chanel)|1:1 copy|aaa quality|mirror quality)\b/i,
+    'Replica / counterfeit wording.','Remove it. Etsy prohibits replicas of branded goods.'],
+  ['amber','Intellectual Property',/\b(dupes?|inspired by|in the style of|not affiliated with|unofficial|fan ?art|parody)\b/i,
+    '“Inspired by / dupe / fan art” wording signals someone else’s IP. A disclaimer does not make it allowed.','Remove the wording and any brand it refers to.'],
+  ['red','Prohibited Items',/\b(cbd|thc|delta[- ]?[89]|kratom|psilocybin|magic mushrooms?|marijuana|cannabis oil|bongs?|dab rigs?|glass pipes?|smoking pipes?|one hitter|rolling papers?)\b/i,
+    'Drugs or drug paraphernalia.','Remove this item. Etsy prohibits drugs and drug paraphernalia.'],
+  ['red','Prohibited Items',/\b(vapes?|e-?liquids?|e-?juice|nicotine|cigarettes?|cigars?|tobacco)\b/i,
+    'Tobacco or vaping product.','Remove it unless it is only an accessory with no tobacco/nicotine.'],
+  ['amber','Prohibited Items',/\b(wine|beer|whiske?y|vodka|liquor|tequila|bourbon)\b/i,
+    'Mentions alcohol. Etsy prohibits selling alcohol itself.','Fine for accessories (glasses, labels). Make sure no alcohol is being sold.'],
+  ['red','Prohibited Items',/\b(firearms?|gun parts?|ammunition|ammo|silencers?|suppressors?|switchblades?|butterfly knife|brass knuckles|knuckle dusters?|stun guns?|tasers?|throwing stars?|nunchucks?)\b/i,
+    'Weapon or weapon part.','Remove it. Etsy prohibits weapons and weapon parts.'],
+  ['amber','Prohibited Items',/\b(pepper spray|self[- ]defen[cs]e keychain|kubotan)\b/i,
+    'Self-defence item. Etsy restricts items designed to harm.','Check Etsy’s weapons policy before keeping this listed.'],
+  ['red','Prohibited Items',/(?<!faux |imitation |fake )\b(ivory|rhino horn|tortoise ?shell|sea turtle|tiger (?:skin|claw|tooth)|bear claws?|eagle feathers?|hawk feathers?|owl feathers?)\b/i,
+    'Endangered or protected animal product.','Remove it, or state clearly it is faux / imitation.'],
+  ['red','Prohibited Items',/\b(human (?:bones?|skulls?|teeth|tooth|remains)|real human)\b/i,
+    'Human remains.','Remove it. Etsy prohibits human remains (hair & teeth included).'],
+  ['red','Prohibited Items',/\b(nazi|swastika|kkk|ku klux|white power|confederate flag)\b/i,
+    'Hate symbol or hate group reference.','Remove it. Etsy prohibits items promoting hate.'],
+  ['red','Prohibited Items',/\b(teething (?:necklace|bracelet|anklet)s?|amber teething|sleep positioners?|inclined sleepers?|crib bumpers?|weighted (?:sleep sack|baby blanket)s?)\b/i,
+    'Unsafe infant product (teething jewellery / infant sleep).','Remove it. Etsy bans these for infant safety.'],
+  ['red','Prohibited Items',/\b(cures?|heals?|treats?|prevents?|reverses?)\b[^.]{0,40}\b(cancer|diabetes|anxiety|depression|arthritis|covid|disease|infections?|autism|adhd|insomnia|migraines?|asthma|eczema|psoriasis)\b/i,
+    'Medical claim — says the item cures or treats a condition.','Remove all health claims. Describe the item, not medical benefits.'],
+  ['red','Prohibited Items',/\b(fda[- ]approved|clinically proven|miracle cure)\b/i,
+    'Unverified medical claim.','Remove the claim.'],
+  ['amber','Prohibited Items',/\b(detox|weight loss|boosts? immunity|immune boost|anti[- ]anxiety|pain relief|healing crystals?|covid|coronavirus)\b/i,
+    'Health-related wording that Etsy can treat as a medical claim.','Avoid health claims. For metaphysical items add “for spiritual use only, not medical advice”.'],
+  ['amber','Prohibited Items',/\b(nsfw|xxx|porn|nude|erotic|sex toys?)\b/i,
+    'Adult content.','Pornography is banned. Other adult items must be marked Mature in the listing settings.'],
+  ['red','Fees & Payments',/\b(whats ?app|telegram|paypal\.me|paypal me|venmo|cash ?app|zelle|western union|pay(?: me)? outside etsy|order (?:directly|on my website)|contact me (?:directly|outside)|dm me on (?:instagram|insta|facebook))\b/i,
+    'Sends buyers off Etsy (contact / payment outside Etsy).','Remove it. All contact and payment must stay on Etsy.'],
+  ['red','Fees & Payments',/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i,
+    'Email address in the listing.','Remove it. Buyers must contact you through Etsy Messages.'],
+  ['amber','Fees & Payments',/(?:\+\d{1,3}[\s-]?)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}\b/,
+    'Looks like a phone number.','Remove contact details from the listing.'],
+  ['amber','Fees & Payments',/\b(?:https?:\/\/|www\.)(?![a-z0-9.-]*etsy\.com)\S+/i,
+    'External link to a site outside Etsy.','Remove links that send buyers off Etsy.'],
+  ['red','House Rules',/\b(giveaways?|raffles?|lottery|sweepstakes?)\b/i,
+    'Giveaway / raffle / lottery.','Remove it. Etsy does not allow raffles or giveaways in listings.'],
+  ['red','Creativity Standards',/\b(dropship(?:ping|ped)?|aliexpress|temu|shein|alibaba|dhgate|wholesale lot)\b/i,
+    'Resold / dropshipped item. Etsy requires items you made, designed, curated (vintage) or sourced.','Remove the listing or list only items you make or design.'],
+  ['amber','Creativity Standards',/\b(made in china|mass[- ]produced|factory[- ]made)\b/i,
+    'Suggests a mass-produced item.','Make sure you designed it and disclose production partners.'],
+];
+let pv={list:[],src:'',filter:'all',run:0,aiDone:0,aiErr:''};
+function pvRules(l){
+  const fields=[['title',l.title||''],['tags',(l.tags||[]).join(', ')],['materials',(l.materials||[]).join(', ')],['description',l.description||'']],out=[];
+  PV_RULES.forEach(([sev,policy,re,text,fix])=>{
+    for(const [where,s] of fields){const m=s.match(re);if(m){out.push({severity:sev,policy,match:m[0],text:text+' (in '+where+')',fix});break;}}
+  });
+  const words=(l.title||'').toLowerCase().match(/[a-z]{4,}/g)||[],cnt={};words.forEach(w=>cnt[w]=(cnt[w]||0)+1);
+  const rep=Object.keys(cnt).filter(w=>cnt[w]>=3);
+  if(rep.length)out.push({severity:'amber',policy:'House Rules',match:rep.join(', '),text:'Keyword stuffing — the same word is repeated 3+ times in the title.',fix:'Write a natural title; use tags for extra keywords.'});
+  if((l.title||'').length>140)out.push({severity:'amber',policy:'House Rules',match:'',text:'Title is over 140 characters.',fix:'Shorten the title to 140 characters or fewer.'});
+  return out;
+}
+function pvIssues(l){
+  const lc=s=>String(s||'').toLowerCase(),seen=new Set();
+  // drop AI findings that repeat a rule finding (same policy, overlapping matched phrase)
+  const ai=(l.ai||[]).filter(a=>!l.rule.some(r=>r.policy===a.policy&&r.match&&a.match&&(lc(a.match).includes(lc(r.match))||lc(r.match).includes(lc(a.match)))));
+  return [...l.rule,...ai].filter(i=>{const k=(i.policy+'|'+(i.match||i.text)).toLowerCase();if(seen.has(k))return false;seen.add(k);return true;})
+    .sort((a,b)=>(a.severity==='red'?0:1)-(b.severity==='red'?0:1));
+}
+function pvStatus(l){const is=pvIssues(l);return is.some(i=>i.severity==='red')?'red':is.length?'amber':(l.ai||l.aiFail)?'clean':'pending';}
+function renderPolicy(){
+  pv.run++;pv.list=[];
+  const w=frame();
+  w.innerHTML=`<section class="hero-input">
+    <div class="chead" style="margin-bottom:6px"><span class="lbl">✦ Policy Violation Check</span></div>
+    <p class="hint" style="margin:0 0 14px 2px">Checks every listing in your shop against Etsy’s policies — trademarks, prohibited items, medical claims, off-Etsy contact, resale &amp; more. Problems are marked <b style="color:var(--err-ink)">red</b> so you can fix them before Etsy does.</p>
+    <div class="urlrow">
+      <div class="urlbox"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1-5h16l1 5"/><path d="M4 9v11h16V9"/><path d="M9 20v-6h6v6"/></svg>
+        <input id="pvurl" placeholder="Your Etsy shop URL — e.g. https://www.etsy.com/shop/YourShopName" autocomplete="off"></div>
+      <button class="btn primary" id="pvgo">Scan shop</button>
+    </div>
+    <div class="pvor">or</div>
+    <div class="pvcsv">
+      <p class="hint">Upload your listings CSV — Etsy <b>Shop Manager → Settings → Options → Download Data → Download CSV</b>. Checks title, tags, materials &amp; full description.</p>
+      <label class="btn ghost sm" style="cursor:pointer"><input type="file" id="pvcsv" accept=".csv,text/csv" hidden>Upload CSV</label>
+    </div>
+  </section>
+  <div id="pvout" style="margin-top:20px"></div>`;
+  $('#pvgo').onclick=pvScan;$('#pvurl').addEventListener('keydown',e=>{if(e.key==='Enter')pvScan();});
+  $('#pvcsv').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)pvCsv(f);};
+}
+function pvMsg(html,cls){$('#pvout').innerHTML=`<div class="card pad"><p style="margin:0" class="${cls||''}">${html}</p></div>`;}
+async function pvScan(){
+  const shop=$('#pvurl').value.trim(),go=$('#pvgo');
+  if(!shop){$('#pvurl').focus();return;}
+  go.disabled=true;go.textContent='Scanning…';
+  $('#pvout').innerHTML=`<div class="card pad"><div class="skel" style="width:55%"></div><div class="skel" style="width:80%"></div><div class="skel" style="width:65%"></div></div>`;
+  try{
+    const r=await fetch('api/policy.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'fetch',shop,token:getToken()})}).then(r=>r.json());
+    if(r.error)pvMsg(esc(r.error)+(r.need_csv?' <br><br>👉 Use <b>Upload CSV</b> above.':''),r.need_csv?'':'muted');
+    else if(!r.listings.length)pvMsg('No active listings found in this shop.');
+    else pvLoad(r.listings,r.shop);
+  }catch(e){pvMsg('Network error — please try again.');}
+  go.disabled=false;go.textContent='Scan shop';
+}
+function parseCsv(t){
+  const rows=[];let row=[],f='',q=false;t=t.replace(/^﻿/,'');
+  for(let i=0;i<t.length;i++){const c=t[i];
+    if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;}
+    else if(c==='"')q=true;else if(c===','){row.push(f);f='';}
+    else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;row.push(f);rows.push(row);row=[];f='';}
+    else f+=c;}
+  if(f||row.length){row.push(f);rows.push(row);}
+  return rows.filter(r=>r.some(x=>x.trim()));
+}
+async function pvCsv(file){
+  const rows=parseCsv(await file.text());
+  const h=(rows[0]||[]).map(x=>x.trim().toUpperCase()),col=n=>h.indexOf(n);
+  if(col('TITLE')<0){pvMsg('This doesn’t look like Etsy’s listings CSV (no TITLE column). Download it from Shop Manager → Settings → Options → Download Data.');return;}
+  const g=(r,n)=>col(n)<0?'':(r[col(n)]||'').trim(),split=s=>s.split(',').map(x=>x.trim()).filter(Boolean);
+  const list=rows.slice(1).map((r,i)=>({id:g(r,'LISTING_ID')||'row'+(i+2),title:g(r,'TITLE'),description:g(r,'DESCRIPTION'),
+    tags:split(g(r,'TAGS')),materials:split(g(r,'MATERIALS')),image:g(r,'IMAGE1'),url:'',price:g(r,'PRICE')?g(r,'PRICE')+' '+g(r,'CURRENCY_CODE'):''})).filter(l=>l.title);
+  if(!list.length){pvMsg('No listings found in that CSV.');return;}
+  pvLoad(list,file.name);
+}
+function pvLoad(list,src){
+  const run=++pv.run;
+  pv={list:list.map(l=>({...l,rule:null,ai:null,aiFail:false})),src,filter:'all',run,aiDone:0,aiErr:''};
+  pv.list.forEach(l=>l.rule=pvRules(l));
+  pvDraw();pvAi(run);
+}
+async function pvAi(run){
+  const B=15;
+  for(let i=0;i<pv.list.length;i+=B){
+    if(run!==pv.run)return;
+    const chunk=pv.list.slice(i,i+B);
+    try{
+      const r=await fetch('api/policy.php',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'ai',token:getToken(),listings:chunk.map(l=>({id:l.id,title:l.title,tags:l.tags,materials:l.materials,description:l.description}))})}).then(r=>r.json());
+      if(run!==pv.run)return;
+      if(r.error)throw new Error(r.error);
+      const by={};(r.results||[]).forEach(x=>by[String(x.id)]=x.issues||[]);
+      chunk.forEach(l=>{l.ai=(by[l.id]||[]).filter(x=>x&&x.text);});
+    }catch(e){if(run!==pv.run)return;chunk.forEach(l=>l.aiFail=true);pv.aiErr=e.message||'AI check failed';}
+    pv.aiDone=Math.min(pv.list.length,i+B);pvDraw();
+  }
+}
+function pvDraw(){
+  const out=$('#pvout');if(!out)return;
+  const st=pv.list.map(pvStatus),n=s=>st.filter(x=>x===s).length,tot=pv.list.length,done=pv.aiDone>=tot;
+  const show=pv.list.map((l,i)=>[l,st[i]]).filter(([,s])=>pv.filter==='all'||s===pv.filter||(pv.filter==='issues'&&(s==='red'||s==='amber')))
+    .sort((a,b)=>({red:0,amber:1,pending:2,clean:3})[a[1]]-({red:0,amber:1,pending:2,clean:3})[b[1]]);
+  const lbl={red:'Violation',amber:'Risk',clean:'Safe',pending:'Checking…'};
+  out.innerHTML=`<div class="pvstats">
+      <div class="pvstat"><span>Listings checked</span><b>${tot}</b></div>
+      <div class="pvstat red"><span>🔴 Violations</span><b>${n('red')}</b></div>
+      <div class="pvstat amber"><span>🟠 Risks</span><b>${n('amber')}</b></div>
+      <div class="pvstat ok"><span>🟢 Safe</span><b>${n('clean')}</b></div></div>
+    <section class="card pad">
+      <div class="chead"><span class="lbl">${esc(pv.src)}<span class="n">${tot}</span></span><button class="btn ghost sm" id="pvexp">Export report</button></div>
+      ${done?'':`<div class="pvprog"><i style="width:${Math.round(pv.aiDone/tot*100)}%"></i></div>`}
+      <div class="pvbar"><span class="muted">${done?(pv.aiErr?'⚠ AI deep check partly unavailable ('+esc(pv.aiErr)+') — showing rule-based results for those listings.':'✓ Rule check + AI deep check complete.'):`Rule check done · AI deep check ${pv.aiDone} / ${tot}…`}</span>
+        <div class="seg" role="radiogroup">${[['all','All'],['issues','Issues'],['red','Violations'],['clean','Safe']].map(([k,t])=>`<button role="radio" aria-checked="${pv.filter===k}" data-f="${k}">${t}</button>`).join('')}</div></div>
+      <div id="pvlist">${show.length?show.map(([l,s])=>{const is=pvIssues(l);
+        return `<div class="pvrow ${s}"><div class="pvimg" ${l.image?`style="background-image:url('${esc(l.image)}')"`:''}></div><div class="pvbody">
+          <div class="pvtitle">${l.url?`<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.title)}</a>`:`<span class="t">${esc(l.title)}</span>`}<span class="pvpill ${s}">${lbl[s]}</span></div>
+          ${is.length?`<ul class="pviss">${is.map(i=>`<li class="${i.severity}"><span class="pol">${esc(i.policy)}</span>${i.match?`<q>${esc(i.match)}</q> — `:''}${esc(i.text)}<span class="fix">✎ ${esc(i.fix)}</span></li>`).join('')}</ul>`
+            :s==='clean'?'<div class="pvsafe">✓ No policy issues found.</div>':''}
+        </div></div>`;}).join(''):'<div class="muted" style="padding:10px 2px">Nothing in this filter.</div>'}</div>
+    </section>`;
+  out.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{pv.filter=b.dataset.f;pvDraw();});
+  $('#pvexp').onclick=()=>{const c=s=>'"'+String(s).replace(/"/g,'""')+'"';
+    dl('policy-report.csv','text/csv','title,status,policy,severity,match,problem,fix,url\n'+pv.list.map(l=>{const s=pvStatus(l),is=pvIssues(l);
+      return (is.length?is:[{}]).map(i=>[l.title,lbl[s],i.policy||'',i.severity||'',i.match||'',i.text||'',i.fix||'',l.url].map(c).join(',')).join('\n');}).join('\n'));};
 }
 
 /* run boot AFTER the whole script has parsed, so every const (kwListGet, CAL_EVENTS…) is initialised */

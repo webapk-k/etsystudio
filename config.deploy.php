@@ -31,4 +31,7 @@ return [
     'admin_password'     => getenv('ADMIN_PASSWORD') ?: 'admin12345',
 
     'scraper_api_key'    => getenv('SCRAPER_API_KEY') ?: '',
+
+    // Etsy Open API v3 key for the Policy Violation shop scan — "keystring:shared_secret" (developer.etsy.com)
+    'etsy_api_key'       => getenv('ETSY_API_KEY') ?: '',
 ];
