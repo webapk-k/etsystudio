@@ -337,6 +337,19 @@ td.sku{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
 .iometa .sz .bad{color:var(--err-ink)}
 @media (max-width:640px){.ioopts{grid-template-columns:1fr}.iorow{gap:10px}.iothumb{width:46px;height:46px}.iorow .btn.sm{width:auto;flex:0 0 auto;height:36px;padding:0 12px;font-size:13px}}
 
+/* ---- image regenerate (AI upscale) ---- */
+.sb-item.sb-sub{padding:7px 12px 7px 41px;font-size:13px;font-weight:600}
+.sb-item.sb-sub svg{width:15px;height:15px}
+.rgcmp{position:relative;margin:4px 0 14px;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:var(--surface-2);user-select:none;touch-action:none}
+.rgcmp img{display:block;width:100%;height:auto;max-height:520px;object-fit:contain}
+.rgcmp .rgbefore{position:absolute;inset:0;clip-path:inset(0 50% 0 0)}
+.rgcmp .rgbefore img{height:100%;image-rendering:auto}
+.rgcmp .rgline{position:absolute;top:0;bottom:0;left:50%;width:2px;background:#fff;box-shadow:0 0 6px rgba(0,0,0,.4);pointer-events:none}
+.rgcmp .rgtag{position:absolute;top:10px;padding:3px 9px;border-radius:999px;background:rgba(0,0,0,.6);color:#fff;font-size:11.5px;font-weight:700}
+.rgcmp input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize;margin:0}
+.rgbar{height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin-top:6px;max-width:260px}
+.rgbar i{display:block;height:100%;background:var(--accent);width:0;transition:width .2s}
+
 /* ---- policy violation scanner ---- */
 .pvor{display:flex;align-items:center;gap:12px;margin:16px 0 12px;color:var(--faint);font-size:12px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;position:relative;z-index:1}
 .pvor::before,.pvor::after{content:"";flex:1;height:1px;background:var(--border)}
@@ -678,6 +691,7 @@ body.showing-landing .topbar .brand{display:flex}
     <button class="sb-item" data-view="research"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-7"/><path d="M17 8h4v4"/></svg>Product Research</button>
     <button class="sb-item" data-view="tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>Tools</button>
     <button class="sb-item" data-view="imgopt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>Image Optimize</button>
+    <button class="sb-item sb-sub" data-view="imgregen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9Z"/><path d="M19 15v4M17 17h4"/></svg>Image Regenerate</button>
     <button class="sb-item" data-view="policy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Policy Violation</button>
     <div class="sb-sep"></div>
     <button class="sb-item" data-view="plans"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 6.3 6.9.9-5 4.8 1.2 6.9L12 18.6 5.9 20.9 7.1 14l-5-4.8 6.9-.9L12 2Z"/></svg>Plans &amp; Pricing</button>
@@ -1274,6 +1288,7 @@ function showView(v){
   else if(v==='research')renderResearch();
   else if(v==='tools')renderTools();
   else if(v==='imgopt')renderImgOpt();
+  else if(v==='imgregen')renderImgRegen();
   else if(v==='policy')renderPolicy();
   else if(v==='plans')renderPaywall(false);
 }
@@ -1754,7 +1769,7 @@ function renderImgOpt(){
   drop.addEventListener('drop',ev=>add(ev.dataTransfer.files));
   const syncQ=()=>{const png=$('#iofmt').value==='image/png';$('#ioq').disabled=png;$('#ioqv').textContent=png?'lossless':$('#ioq').value+'%';};
   $('#ioq').oninput=syncQ;$('#iofmt').onchange=syncQ;
-  $('#iogo').onclick=ioRun;$('#iozip').onclick=ioZip;
+  $('#iogo').onclick=ioRun;$('#iozip').onclick=()=>ioZip(ioFiles,'#iozip','optimized-images.zip');
   $('#ioclr').onclick=()=>{ioFiles=[];ioDraw();};
 }
 function ioDraw(){
@@ -1819,13 +1834,119 @@ async function ioRun(){
   }
   go.disabled=!ioFiles.length;go.textContent='Convert';
 }
-async function ioZip(){
-  const b=$('#iozip');b.disabled=true;b.textContent='Zipping…';
+async function ioZip(files,btn,zipName){
+  const b=$(btn),label=b.textContent;b.disabled=true;b.textContent='Zipping…';
   try{await loadJs(IO_ZIP);const z=new JSZip(),seen={};
-    ioFiles.filter(x=>x.out).forEach(x=>{let n=x.out.name;if(seen[n])n=n.replace(/(\.\w+)$/,'-'+(++seen[n])+'$1');else seen[n]=1;z.file(n,x.out.blob);});
-    dl('optimized-images.zip','application/zip',await z.generateAsync({type:'blob'}));}
+    files.filter(x=>x.out).forEach(x=>{let n=x.out.name;if(seen[n])n=n.replace(/(\.\w+)$/,'-'+(++seen[n])+'$1');else seen[n]=1;z.file(n,x.out.blob);});
+    dl(zipName,'application/zip',await z.generateAsync({type:'blob'}));}
   catch(e){alert(e.message);}
-  b.disabled=false;b.textContent='Download all (.zip)';
+  b.disabled=false;b.textContent=label;
+}
+
+/* image regenerate — AI super-resolution (Real-ESRGAN via UpscalerJS + TensorFlow.js), runs in the browser */
+const RG_CDN='https://cdn.jsdelivr.net/npm/';
+const RG_LIBS=[RG_CDN+'@tensorflow/tfjs@4.11.0/dist/tf.min.js',RG_CDN+'@upscalerjs/default-model@1.0.0/dist/umd/index.min.js',RG_CDN+'upscaler@1.0.0/dist/browser/umd/upscaler.min.js'];
+const RG_MAXIN={2:1500,4:1000};  // input cap per scale: output stays ≤ 4000px and the browser keeps up
+let rgFiles=[],rgSel=-1,rgUp={};
+const rgUrl=b=>b._u||(b._u=URL.createObjectURL(b));  // one object URL per blob, so redraws don't break images still loading
+const rgFree=xs=>xs.forEach(x=>[x.file,x.out&&x.out.blob].forEach(b=>{if(b&&b._u){URL.revokeObjectURL(b._u);b._u=null;}}));
+function renderImgRegen(){
+  rgFree(rgFiles);rgFiles=[];rgSel=-1;const w=frame();
+  w.innerHTML=`<section class="hero-input">
+    <div class="chead" style="margin-bottom:6px"><span class="lbl">✦ Image Regenerate</span></div>
+    <p class="hint" style="margin:0 0 14px 2px">Turn small, blurry or low-quality photos into sharp HD images with AI upscaling (2× or 4×). Free and private — the AI runs in your browser, nothing is uploaded.</p>
+    <label class="iodrop" id="rgdrop"><input type="file" id="rgfile" multiple accept="image/*,.ai,.pdf" hidden>
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9Z"/><path d="M19 15v4M17 17h4"/></svg>
+      <b>Drop low-quality images here or click to choose</b><span class="muted" style="font-size:13px">JPG · PNG · WEBP · GIF · BMP · AVIF</span></label>
+    <div class="ioopts">
+      <div class="field"><label for="rgscale">Upscale</label><select class="mksel" id="rgscale"><option value="0">Auto — to HD (2000px+)</option><option value="2">2× larger</option><option value="4">4× larger</option></select></div>
+      <div class="field"><label for="rgmodel">AI quality</label><select class="mksel" id="rgmodel"><option value="medium">Best detail (slower)</option><option value="slim">Fast</option></select></div>
+      <div class="field"><label for="rgfmt">Save as</label><select class="mksel" id="rgfmt"><option value="image/jpeg">JPG (Etsy)</option><option value="image/png">PNG</option><option value="image/webp">WEBP</option></select></div>
+    </div>
+    <div class="ioacts"><button class="btn primary" id="rggo" disabled>Regenerate in HD</button>
+      <button class="btn ghost" id="rgzip" style="display:none">Download all (.zip)</button><button class="btn ghost" id="rgclr" style="display:none">Clear</button></div>
+  </section>
+  <div id="rgout" style="margin-top:20px"></div>`;
+  const drop=$('#rgdrop'),inp=$('#rgfile');
+  const add=fl=>{for(const f of fl)rgFiles.push({file:f,out:null,err:''});inp.value='';rgDraw();};
+  inp.onchange=()=>add(inp.files);
+  ['dragenter','dragover'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('over');}));
+  ['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('over');}));
+  drop.addEventListener('drop',ev=>add(ev.dataTransfer.files));
+  ['rgscale','rgmodel','rgfmt'].forEach(id=>$('#'+id).onchange=()=>{rgFree(rgFiles.filter(x=>x.out).map(x=>({out:x.out})));rgFiles.forEach(x=>x.out=null);rgSel=-1;rgDraw();});
+  $('#rggo').onclick=rgRun;$('#rgzip').onclick=()=>ioZip(rgFiles,'#rgzip','hd-images.zip');
+  $('#rgclr').onclick=()=>{rgFree(rgFiles);rgFiles=[];rgSel=-1;rgDraw();};
+}
+function rgDraw(){
+  const out=$('#rgout');if(!out)return;
+  const busy=rgFiles.some(x=>x.busy),url=rgUrl;
+  $('#rggo').disabled=busy||!rgFiles.length;$('#rgclr').style.display=rgFiles.length&&!busy?'':'none';
+  $('#rgzip').style.display=rgFiles.filter(x=>x.out).length>1&&!busy?'':'none';
+  if(!rgFiles.length){out.innerHTML='';return;}
+  const sel=rgFiles[rgSel]&&rgFiles[rgSel].out?rgFiles[rgSel]:null;
+  out.innerHTML=`<section class="card pad">${sel?`<div class="chead"><span class="lbl">Before / After</span><span class="muted" style="font-size:12.5px">drag to compare</span></div>
+    <div class="rgcmp" id="rgcmp"><img src="${url(sel.out.blob)}" alt="After"><div class="rgbefore"><img src="${url(sel.file)}" alt="Before"></div>
+      <div class="rgline"></div><span class="rgtag" style="left:10px">Before · ${sel.out.w0}×${sel.out.h0}</span><span class="rgtag" style="right:10px">HD · ${sel.out.w}×${sel.out.h}</span>
+      <input type="range" min="0" max="100" value="50" aria-label="Compare before and after"></div>`:''}
+    <div class="chead"><span class="lbl">Files<span class="n">${rgFiles.length}</span></span></div><div id="rglist"></div></section>`;
+  const cmp=$('#rgcmp');
+  if(cmp){const r=cmp.querySelector('input');r.oninput=()=>{cmp.querySelector('.rgbefore').style.clipPath=`inset(0 ${100-r.value}% 0 0)`;cmp.querySelector('.rgline').style.left=r.value+'%';};}
+  const list=$('#rglist');
+  rgFiles.forEach((x,i)=>{
+    const r=document.createElement('div');r.className='iorow';
+    const src=x.out?x.out.blob:(/^image\/(?!svg)/.test(x.file.type)?x.file:null);
+    let sz=fmtKB(x.file.size);
+    if(x.err)sz+=` · <span class="bad">${esc(x.err)}</span>`;
+    else if(x.busy)sz+=` · ${esc(x.stage||'')}<div class="rgbar"><i id="rgbar${i}" style="width:${Math.round((x.pct||0)*100)}%"></i></div>`;
+    else if(x.out)sz+=` → <span class="save">${x.out.w0}×${x.out.h0} → ${x.out.w}×${x.out.h}px HD</span> · ${fmtKB(x.out.blob.size)}`;
+    r.innerHTML=`<div class="iothumb" ${src?`style="background-image:url('${url(src)}')"`:''}></div><div class="iometa"><div class="nm">${esc(x.out?x.out.name:x.file.name)}</div><div class="sz">${sz}</div></div>
+      ${x.out&&i!==rgSel?'<button class="btn ghost sm" data-a="cmp">Compare</button>':''}${x.out?'<button class="btn primary sm" data-a="dl">Download</button>':''}${busy?'':'<button class="icobtn" data-a="rm" title="Remove">&times;</button>'}`;
+    const on=(a,f)=>{const b=r.querySelector(`[data-a=${a}]`);if(b)b.onclick=f;};
+    on('rm',()=>{rgFree(rgFiles.splice(i,1));if(rgSel>=i)rgSel--;rgDraw();});
+    on('cmp',()=>{rgSel=i;rgDraw();$('#rgout').scrollIntoView({behavior:'smooth'});});
+    on('dl',()=>dl(x.out.name,x.out.blob.type,x.out.blob));
+    list.appendChild(r);
+  });
+}
+async function rgModel(size,scale){
+  const k=size+scale;if(rgUp[k])return rgUp[k];
+  for(const s of RG_LIBS)await loadJs(s);  // order matters: tf → default model → upscaler
+  await loadJs(`${RG_CDN}@upscalerjs/esrgan-${size}@1.0.0/dist/umd/models/esrgan-${size}/src/x${scale}/index.min.js`);
+  Object.values(rgUp).forEach(u=>u.dispose());rgUp={};  // keep only one model in GPU memory
+  return rgUp[k]=new window.Upscaler({model:window[(size==='slim'?'ESRGANSlim':'ESRGANMedium')+scale+'x']});
+}
+async function rgRun(){
+  const want=+$('#rgscale').value,size=$('#rgmodel').value,mime=$('#rgfmt').value,go=$('#rggo');
+  let todo=rgFiles.filter(x=>!x.out);if(!todo.length)todo=rgFiles.slice();
+  rgFree(todo.filter(x=>x.out).map(x=>({out:x.out})));
+  todo.forEach(x=>{x.out=null;x.err='';x.busy=true;x.pct=0;x.stage='waiting…';});go.textContent='Regenerating…';rgDraw();
+  for(const x of todo){
+    const i=rgFiles.indexOf(x);
+    try{
+      let c=await ioCanvas(x.file,0);const w0=c.width,h0=c.height;
+      // Auto: keep enhancing (max 2 AI passes, e.g. 128 → 512 → 2048px) until the image is Etsy-HD
+      const passes=want?[want]:[];if(!want)for(let L=Math.max(w0,h0);L<1800&&passes.length<2;){const k=L*2>=1800?2:4;passes.push(k);L=Math.min(L,RG_MAXIN[k])*k;}
+      if(!passes.length)passes.push(2);
+      let img=c;
+      for(const [n,scale] of passes.entries()){
+        const L=Math.max(img.width,img.height),cap=RG_MAXIN[scale];
+        if(L>cap){const t=document.createElement('canvas'),k=cap/L;t.width=Math.round(img.width*k);t.height=Math.round(img.height*k);  // shrink huge inputs so the browser doesn't run out of memory
+          const tx=t.getContext('2d');tx.imageSmoothingQuality='high';tx.drawImage(img,0,0,t.width,t.height);img=t;}
+        const flat=document.createElement('canvas');flat.width=img.width;flat.height=img.height;  // the models are RGB-only: flatten on white
+        const fx=flat.getContext('2d');fx.fillStyle='#fff';fx.fillRect(0,0,flat.width,flat.height);fx.drawImage(img,0,0);
+        x.stage='loading AI model (first time only)…';x.pct=0;rgDraw();
+        const up=await rgModel(size,scale);
+        x.stage=`enhancing ${scale}×${passes.length>1?` (pass ${n+1} of ${passes.length})`:''} — keep this tab open…`;rgDraw();
+        const data=await up.execute(flat,{patchSize:64,padding:6,awaitNextFrame:true,
+          progress:p=>{x.pct=p;const b=document.getElementById('rgbar'+i);if(b)b.style.width=Math.round(p*100)+'%';}});
+        img=await new Promise((ok,no)=>{const m=new Image();m.onload=()=>ok(m);m.onerror=()=>no(new Error('Could not read the result'));m.src=data;});
+      }
+      x.out={blob:await ioEncode(img,mime,.93),w0,h0,w:img.width,h:img.height,name:x.file.name.replace(/\.[^.]+$/,'')+'-hd.'+IO_EXT[mime]};
+      rgSel=i;
+    }catch(e){x.err=/webgl|memory|oom|allocate/i.test(e.message||'')?'Not enough graphics memory — try “Fast” or 2×':(e.message||'Upscaling failed');}
+    x.busy=false;rgDraw();
+  }
+  go.textContent='Regenerate in HD';rgDraw();
 }
 
 /* policy violation — instant rule checks + AI review (api/policy.php) of every listing in a shop */
