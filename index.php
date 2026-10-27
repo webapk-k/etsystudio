@@ -370,6 +370,8 @@ td.sku{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
 .pviss .red .pol{background:var(--err);color:#fff}.pviss .amber .pol{background:var(--warn);color:#fff}
 .pviss q{font-weight:650;color:var(--err-ink);quotes:"“" "”"}
 .pviss .fix{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.pvnote{font-size:14px;line-height:1.5;color:var(--warn-ink)}
+.pvnote b{color:var(--warn-ink)}
 .pvsafe{font-size:12.5px;color:var(--ok-ink);margin-top:6px}
 @media (max-width:640px){.pvstats{grid-template-columns:repeat(2,minmax(0,1fr))}.pvrow{padding:12px;gap:10px}.pvimg{width:48px;height:48px}}
 
@@ -1906,8 +1908,8 @@ function renderPolicy(){
     <p class="hint" style="margin:0 0 14px 2px">Checks every listing in your shop against Etsy’s policies — trademarks, prohibited items, medical claims, off-Etsy contact, resale &amp; more. Problems are marked <b style="color:var(--err-ink)">red</b> so you can fix them before Etsy does.</p>
     <div class="urlrow">
       <div class="urlbox"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1-5h16l1 5"/><path d="M4 9v11h16V9"/><path d="M9 20v-6h6v6"/></svg>
-        <input id="pvurl" placeholder="Your Etsy shop URL — e.g. https://www.etsy.com/shop/YourShopName" autocomplete="off"></div>
-      <button class="btn primary" id="pvgo">Scan shop</button>
+        <input id="pvurl" placeholder="Etsy shop URL (etsy.com/shop/YourShop) or a listing URL" autocomplete="off"></div>
+      <button class="btn primary" id="pvgo">Scan</button>
     </div>
     <div class="pvor">or</div>
     <div class="pvcsv">
@@ -1919,7 +1921,7 @@ function renderPolicy(){
   $('#pvgo').onclick=pvScan;$('#pvurl').addEventListener('keydown',e=>{if(e.key==='Enter')pvScan();});
   $('#pvcsv').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)pvCsv(f);};
 }
-function pvMsg(html,cls){$('#pvout').innerHTML=`<div class="card pad"><p style="margin:0" class="${cls||''}">${html}</p></div>`;}
+function pvMsg(html){$('#pvout').innerHTML=`<div class="banner caution"><div class="pvnote">⚠ ${html}</div></div>`;}
 async function pvScan(){
   const shop=$('#pvurl').value.trim(),go=$('#pvgo');
   if(!shop){$('#pvurl').focus();return;}
@@ -1927,11 +1929,11 @@ async function pvScan(){
   $('#pvout').innerHTML=`<div class="card pad"><div class="skel" style="width:55%"></div><div class="skel" style="width:80%"></div><div class="skel" style="width:65%"></div></div>`;
   try{
     const r=await fetch('api/policy.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'fetch',shop,token:getToken()})}).then(r=>r.json());
-    if(r.error)pvMsg(esc(r.error)+(r.need_csv?' <br><br>👉 Use <b>Upload CSV</b> above.':''),r.need_csv?'':'muted');
+    if(r.error)pvMsg(esc(r.error)+(r.need_csv?' <br>👉 Use <b>Upload CSV</b> above.':''));
     else if(!r.listings.length)pvMsg('No active listings found in this shop.');
-    else pvLoad(r.listings,r.shop);
+    else pvLoad(r.listings,r.shop,r.note);
   }catch(e){pvMsg('Network error — please try again.');}
-  go.disabled=false;go.textContent='Scan shop';
+  go.disabled=false;go.textContent='Scan';
 }
 function parseCsv(t){
   const rows=[];let row=[],f='',q=false;t=t.replace(/^﻿/,'');
@@ -1953,9 +1955,9 @@ async function pvCsv(file){
   if(!list.length){pvMsg('No listings found in that CSV.');return;}
   pvLoad(list,file.name);
 }
-function pvLoad(list,src){
+function pvLoad(list,src,note){
   const run=++pv.run;
-  pv={list:list.map(l=>({...l,rule:null,ai:null,aiFail:false})),src,filter:'all',run,aiDone:0,aiErr:''};
+  pv={list:list.map(l=>({...l,rule:null,ai:null,aiFail:false})),src,note:note||'',filter:'all',run,aiDone:0,aiErr:''};
   pv.list.forEach(l=>l.rule=pvRules(l));
   pvDraw();pvAi(run);
 }
@@ -1981,7 +1983,7 @@ function pvDraw(){
   const show=pv.list.map((l,i)=>[l,st[i]]).filter(([,s])=>pv.filter==='all'||s===pv.filter||(pv.filter==='issues'&&(s==='red'||s==='amber')))
     .sort((a,b)=>({red:0,amber:1,pending:2,clean:3})[a[1]]-({red:0,amber:1,pending:2,clean:3})[b[1]]);
   const lbl={red:'Violation',amber:'Risk',clean:'Safe',pending:'Checking…'};
-  out.innerHTML=`<div class="pvstats">
+  out.innerHTML=`${pv.note?`<div class="banner caution" style="margin-bottom:14px"><div class="pvnote">ⓘ ${esc(pv.note)}</div></div>`:''}<div class="pvstats">
       <div class="pvstat"><span>Listings checked</span><b>${tot}</b></div>
       <div class="pvstat red"><span>🔴 Violations</span><b>${n('red')}</b></div>
       <div class="pvstat amber"><span>🟠 Risks</span><b>${n('amber')}</b></div>

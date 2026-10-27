@@ -26,10 +26,32 @@ try {
 
     if ($action === 'fetch') {
         $key  = trim((string) ($config['etsy_api_key'] ?? ''));
-        $shop = els_shop_name((string) ($in['shop'] ?? ''));
-        if ($shop === '') { throw new RuntimeException('Paste your Etsy shop URL — e.g. https://www.etsy.com/shop/YourShopName'); }
+        $raw  = (string) ($in['shop'] ?? '');
+
+        // A single listing URL → check just that listing (full data via the API, else its title from the URL).
+        if (preg_match('~/listing/(\d+)(?:/([^/?#]+))?~i', $raw, $lm)) {
+            $listing = null; $note = '';
+            if ($key !== '') {
+                try { $listing = els_norm_listing(els_etsy($key, '/application/listings/' . $lm[1] . '?includes=Images')); }
+                catch (Throwable $e) { $note = $e->getMessage(); }
+            }
+            if (!$listing) {
+                $title = ucwords(trim(str_replace(['-', '_', '+'], ' ', urldecode($lm[2] ?? ''))));
+                if ($title === '') { throw new RuntimeException('Paste the full listing URL (…/listing/ID/product-name) or your shop URL.'); }
+                $listing = ['id' => $lm[1], 'title' => $title, 'description' => '', 'tags' => [], 'materials' => [],
+                            'url' => 'https://www.etsy.com/listing/' . $lm[1], 'image' => '', 'price' => ''];
+                $note = 'Only the title could be read from the link (Etsy shop scanning is pending approval). Upload your listings CSV for a full check of tags & description.';
+            }
+            if ($authUser) { els_history_add($authUser['email'], $authUser['name'] ?? '', 'policy', 'listing ' . $lm[1]); }
+            echo json_encode(['ok' => true, 'shop' => 'Listing #' . $lm[1], 'total' => 1, 'listings' => [$listing], 'note' => $note],
+                JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $shop = els_shop_name($raw);
+        if ($shop === '') { throw new RuntimeException('Paste your Etsy shop URL (https://www.etsy.com/shop/YourShopName) or a listing URL.'); }
         if ($key === '') {
-            echo json_encode(['error' => 'Shop scanning needs an Etsy API key (not set up yet). For now, upload your listings CSV below — it checks every listing the same way.', 'need_csv' => true]);
+            echo json_encode(['error' => 'Shop scanning needs an Etsy API key (not set up yet). For now, upload your listings CSV instead — it checks every listing the same way.', 'need_csv' => true]);
             exit;
         }
         $found = els_etsy($key, '/application/shops?shop_name=' . rawurlencode($shop) . '&limit=5');
@@ -43,20 +65,7 @@ try {
         $listings = [];
         for ($offset = 0; $offset < ELS_POLICY_MAX; $offset += 100) {
             $page = els_etsy($key, "/application/shops/{$shopId}/listings/active?limit=100&offset={$offset}&includes=Images");
-            foreach (($page['results'] ?? []) as $l) {
-                $price = $l['price'] ?? [];
-                $listings[] = [
-                    'id'          => (string) $l['listing_id'],
-                    'title'       => html_entity_decode((string) ($l['title'] ?? ''), ENT_QUOTES, 'UTF-8'),
-                    'description' => html_entity_decode((string) ($l['description'] ?? ''), ENT_QUOTES, 'UTF-8'),
-                    'tags'        => array_values((array) ($l['tags'] ?? [])),
-                    'materials'   => array_values((array) ($l['materials'] ?? [])),
-                    'url'         => (string) ($l['url'] ?? ''),
-                    'image'       => (string) ($l['images'][0]['url_170x135'] ?? ''),
-                    'price'       => isset($price['amount'], $price['divisor']) && $price['divisor']
-                                       ? number_format($price['amount'] / $price['divisor'], 2) . ' ' . ($price['currency_code'] ?? '') : '',
-                ];
-            }
+            foreach (($page['results'] ?? []) as $l) { $listings[] = els_norm_listing($l); }
             if (count($page['results'] ?? []) < 100) { break; }
         }
         if ($authUser) { els_history_add($authUser['email'], $authUser['name'] ?? '', 'policy', $shop); }
@@ -145,6 +154,22 @@ function els_shop_name(string $s): string {
     return preg_match('~^[A-Za-z0-9]{3,40}$~', $s) ? $s : '';
 }
 
+/** Etsy API listing → the shape the scanner uses. */
+function els_norm_listing(array $l): array {
+    $price = $l['price'] ?? [];
+    return [
+        'id'          => (string) ($l['listing_id'] ?? ''),
+        'title'       => html_entity_decode((string) ($l['title'] ?? ''), ENT_QUOTES, 'UTF-8'),
+        'description' => html_entity_decode((string) ($l['description'] ?? ''), ENT_QUOTES, 'UTF-8'),
+        'tags'        => array_values((array) ($l['tags'] ?? [])),
+        'materials'   => array_values((array) ($l['materials'] ?? [])),
+        'url'         => (string) ($l['url'] ?? ''),
+        'image'       => (string) ($l['images'][0]['url_170x135'] ?? ''),
+        'price'       => isset($price['amount'], $price['divisor']) && $price['divisor']
+                           ? number_format($price['amount'] / $price['divisor'], 2) . ' ' . ($price['currency_code'] ?? '') : '',
+    ];
+}
+
 /** GET an Etsy Open API v3 endpoint. $key is "keystring:shared_secret". */
 function els_etsy(string $key, string $path): array {
     $ch = curl_init('https://openapi.etsy.com/v3' . $path);
@@ -160,7 +185,7 @@ function els_etsy(string $key, string $path): array {
     curl_close($ch);
     if ($body === false) { throw new RuntimeException('Could not reach Etsy: ' . $err); }
     $j = json_decode((string) $body, true);
-    if ($status === 401 || $status === 403) { throw new RuntimeException('Etsy shop scanning isn’t active yet (the Etsy API key is pending approval or invalid). Meanwhile, upload your listings CSV below — it checks every listing the same way.'); }
+    if ($status === 401 || $status === 403) { throw new RuntimeException('Etsy shop scanning isn’t active yet (the Etsy API key is pending approval or invalid). Meanwhile, upload your listings CSV instead — it checks every listing the same way.'); }
     if ($status === 429) { throw new RuntimeException('Etsy rate limit hit — wait a minute and try again.'); }
     if ($status < 200 || $status >= 300) { throw new RuntimeException('Etsy API error ' . $status . ': ' . ($j['error'] ?? 'unknown')); }
     return is_array($j) ? $j : [];
