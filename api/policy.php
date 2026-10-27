@@ -133,7 +133,8 @@ SYS;
     if (!is_array($data) || !isset($data['results'])) { throw new RuntimeException('The AI returned an unexpected format. Please try again.'); }
     echo json_encode(['ok' => true, 'results' => $data['results']], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 } catch (Throwable $e) {
-    echo json_encode(['error' => $e->getMessage()]);
+    // any Etsy-API failure → steer the user to the CSV upload, which needs no key
+    echo json_encode(['error' => $e->getMessage(), 'need_csv' => str_starts_with($e->getMessage(), 'Etsy')]);
 }
 
 /** Shop name from a URL (etsy.com/shop/Name, name.etsy.com) or a bare name. */
@@ -159,7 +160,7 @@ function els_etsy(string $key, string $path): array {
     curl_close($ch);
     if ($body === false) { throw new RuntimeException('Could not reach Etsy: ' . $err); }
     $j = json_decode((string) $body, true);
-    if ($status === 401 || $status === 403) { throw new RuntimeException('Etsy rejected the API key — check ETSY_API_KEY (format keystring:shared_secret).'); }
+    if ($status === 401 || $status === 403) { throw new RuntimeException('Etsy shop scanning isn’t active yet (the Etsy API key is pending approval or invalid). Meanwhile, upload your listings CSV below — it checks every listing the same way.'); }
     if ($status === 429) { throw new RuntimeException('Etsy rate limit hit — wait a minute and try again.'); }
     if ($status < 200 || $status >= 300) { throw new RuntimeException('Etsy API error ' . $status . ': ' . ($j['error'] ?? 'unknown')); }
     return is_array($j) ? $j : [];
