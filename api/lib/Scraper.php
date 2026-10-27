@@ -14,11 +14,14 @@ class Scraper
     private ?string $caBundle = null;
     private string $scraperApiKey = '';
     private string $jinaApiKey = '';
+    private array $aliexpress = [];
 
-    public function __construct(string $scraperApiKey = '', string $jinaApiKey = '')
+    /** @param array $aliexpress ['app_key'=>..., 'app_secret'=>..., 'tracking_id'=>...] — AliExpress Affiliate API (optional) */
+    public function __construct(string $scraperApiKey = '', string $jinaApiKey = '', array $aliexpress = [])
     {
         $this->scraperApiKey = trim($scraperApiKey);
         $this->jinaApiKey    = trim($jinaApiKey);
+        $this->aliexpress    = array_map(fn($v) => trim((string) $v), $aliexpress);
     }
 
     /**
@@ -39,6 +42,12 @@ class Scraper
             }
             $data['_source'] = 'pasted';
             return $data;
+        }
+
+        // Path A2: AliExpress via the official Affiliate API — no captcha, works for any item link.
+        $api = $this->aliexpressProduct($url);
+        if ($api !== null) {
+            return $api;
         }
 
         // Path B: network fetch.
@@ -100,6 +109,89 @@ class Scraper
                            . "and paste it into \"Paste page content instead\" — that always works.",
             'sourceUrl'   => $resp['finalUrl'] ?? $url,
         ];
+    }
+
+    /**
+     * Product details from the AliExpress Affiliate API (aliexpress.affiliate.productdetail.get) by item ID.
+     * Null when no API key is configured, the URL isn't an AliExpress item, or the call fails —
+     * the caller then falls back to the page reader.
+     */
+    private function aliexpressProduct(string $url): ?array
+    {
+        $key = $this->aliexpress['app_key'] ?? ''; $secret = $this->aliexpress['app_secret'] ?? '';
+        if ($key === '' || $secret === '') { return null; }
+        $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+        if (!str_contains($host, 'aliexpress.') || !preg_match('~/item/(\d+)\.html~', $url, $m)) {
+            // short share links (a.aliexpress.com/_xxx, s.click…) — follow the redirect to the item URL
+            if (!preg_match('~(^|\.)(a|s\.click)\.aliexpress\.com$~', $host)) { return null; }
+            $final = $this->resolveRedirect($url);
+            if (!preg_match('~/item/(\d+)\.html~', $final, $m)) { return null; }
+        }
+
+        $params = [
+            'app_key'         => $key,
+            'method'          => 'aliexpress.affiliate.productdetail.get',
+            'sign_method'     => 'sha256',
+            'timestamp'       => (string) round(microtime(true) * 1000),
+            'product_ids'     => $m[1],
+            'target_currency' => 'USD',
+            'target_language' => 'EN',
+            'ship_to_country' => 'US',
+        ];
+        if (($this->aliexpress['tracking_id'] ?? '') !== '') { $params['tracking_id'] = $this->aliexpress['tracking_id']; }
+        ksort($params);
+        $base = '';
+        foreach ($params as $k => $v) { $base .= $k . $v; }
+        $params['sign'] = strtoupper(hash_hmac('sha256', $base, $secret));
+
+        $ch = curl_init('https://api-sg.aliexpress.com/sync');
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => http_build_query($params),
+            CURLOPT_HTTPHEADER     => ['Content-Type: application/x-www-form-urlencoded;charset=utf-8'],
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_TIMEOUT        => 25,
+        ]);
+        $this->applySsl($ch);
+        $body = curl_exec($ch);
+        curl_close($ch);
+        $j = json_decode((string) $body, true);
+        $p = $j['aliexpress_affiliate_productdetail_get_response']['resp_result']['result']['products']['product'][0] ?? null;
+        if (!is_array($p) || empty($p['product_title'])) {
+            if (is_array($j)) { error_log('AliExpress API: ' . mb_substr((string) $body, 0, 300)); }
+            return null;
+        }
+
+        $images = array_values(array_filter(array_merge(
+            [(string) ($p['product_main_image_url'] ?? '')],
+            (array) ($p['product_small_image_urls']['string'] ?? [])
+        )));
+        $cats  = array_filter([(string) ($p['first_level_category_name'] ?? ''), (string) ($p['second_level_category_name'] ?? '')]);
+        $price = (string) ($p['target_sale_price'] ?? $p['sale_price'] ?? '');
+        $data  = $this->emptyProduct();
+        $data['name']      = trim((string) $p['product_title']);
+        $data['images']    = $this->dedupeImages($images);
+        $data['price']     = $price;
+        $data['currency']  = (string) ($p['target_sale_price_currency'] ?? 'USD');
+        $data['specs']     = $cats ? [['key' => 'Category', 'value' => implode(' > ', $cats)]] : [];
+        $data['text']      = $data['name'] . ($cats ? "\nCategory: " . implode(' > ', $cats) : '');
+        $data['sourceUrl'] = (string) ($p['product_detail_url'] ?? $url);
+        $data['_source']   = 'aliexpress-api';
+        return $data;
+    }
+
+    /** Follow redirects (HEAD-style) and return the final URL. */
+    private function resolveRedirect(string $url): string
+    {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [CURLOPT_NOBODY => true, CURLOPT_FOLLOWLOCATION => true, CURLOPT_MAXREDIRS => 6,
+            CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 15]);
+        $this->applySsl($ch);
+        curl_exec($ch);
+        $final = (string) curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+        curl_close($ch);
+        return $final ?: $url;
     }
 
     /** True when a page's title/heading is an error page ("404", "Page not found", "Oops"…). */

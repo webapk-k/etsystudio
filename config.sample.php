@@ -60,6 +60,10 @@ return [
     // (AliExpress / Amazon / Temu links are read through it). Leave empty to use it keyless.
     'jina_api_key' => '',
 
+    // Optional: AliExpress Affiliate API — reads ANY AliExpress item link (title, all images, price)
+    // without captchas. Free: join portals.aliexpress.com, then create an app at open.aliexpress.com.
+    'aliexpress' => ['app_key' => '', 'app_secret' => '', 'tracking_id' => ''],
+
     // Policy Violation → "Scan shop" reads a shop's active listings via the Etsy Open API v3.
     // Create an app at https://www.etsy.com/developers and paste "keystring:shared_secret" here.
     // Leave empty to use the listings-CSV upload instead.
