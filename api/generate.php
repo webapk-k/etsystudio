@@ -323,7 +323,7 @@ function els_make_client(string $provider, array $config): array
         if ($key === '' || stripos($key, 'PASTE') !== false) {
             return [null, 'Add your free Gemini API key in config.php (get one at aistudio.google.com).'];
         }
-        return [new Gemini($key, $config['gemini_model'] ?? 'gemini-2.5-flash'), null];
+        return [new Gemini($key, $config['gemini_model'] ?? 'gemini-2.5-flash', 40, OpenRouter::fallbackFromConfig($config)), null];
     }
     if ($provider === 'openrouter') {
         $key = trim($config['openrouter_api_key'] ?? '');

@@ -79,7 +79,7 @@ try {
     if ($provider === 'gemini') {
         $key = trim($config['gemini_api_key'] ?? '');
         if ($key === '' || stripos($key, 'PASTE') !== false) { echo json_encode(['error' => 'Add your free Gemini API key in config.php (aistudio.google.com).']); exit; }
-        $client = new Gemini($key, $config['gemini_model'] ?? 'gemini-2.5-flash', 90);
+        $client = new Gemini($key, $config['gemini_model'] ?? 'gemini-2.5-flash', 90, OpenRouter::fallbackFromConfig($config));
     } elseif ($provider === 'openrouter') {
         $key = trim($config['openrouter_api_key'] ?? '');
         if ($key === '' || stripos($key, 'PASTE') !== false) { echo json_encode(['error' => 'Add your OpenRouter API key in config.php.']); exit; }

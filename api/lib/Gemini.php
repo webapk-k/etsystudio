@@ -14,9 +14,11 @@ class Gemini
     private string $model;
     private int $timeout;
     private ?string $caBundle = null;
+    private ?object $fallback;   // e.g. a free OpenRouter client, used when every Gemini model is out of quota / busy
 
-    public function __construct(string $apiKey, string $model = 'gemini-2.5-flash', int $timeout = 40)
+    public function __construct(string $apiKey, string $model = 'gemini-2.5-flash', int $timeout = 40, ?object $fallback = null)
     {
+        $this->fallback = $fallback;
         $this->apiKey  = $apiKey;
         $this->model   = $model;
         $this->timeout = $timeout;
@@ -47,6 +49,13 @@ class Gemini
                     if (!$e->retryable) throw $e;   // fatal (bad key, blocked) — stop now
                     usleep(700000 * ($i + 1));        // 0.7s, 1.4s backoff, then next model
                 }
+            }
+        }
+        if ($this->fallback) {
+            try {
+                return $this->fallback->message($system, $userContent, $opts);
+            } catch (Exception $fe) {
+                error_log('Gemini fallback failed: ' . $fe->getMessage());
             }
         }
         throw ($last ?: new GeminiException('Gemini is busy right now — please try again in a few seconds.'));
@@ -107,7 +116,7 @@ class Gemini
         return $text;
     }
 
-    private function callOnce(string $model, string $system, $userContent, array $opts): string
+    protected function callOnce(string $model, string $system, $userContent, array $opts): string
     {
         $userText = is_array($userContent) ? json_encode($userContent) : (string) $userContent;
         $gen = [

@@ -18,6 +18,7 @@ return [
 
     'openrouter_api_key' => getenv('OPENROUTER_API_KEY') ?: '',
     'openrouter_model'   => getenv('OPENROUTER_MODEL') ?: 'meta-llama/llama-3.3-70b-instruct:free',
+    'openrouter_fallback_model' => getenv('OPENROUTER_FALLBACK_MODEL') ?: 'nvidia/nemotron-3-ultra-550b-a55b:free,nvidia/nemotron-3.5-super-vl:free,poolside/laguna-s-2.1:free',  // free backups (tried in order) when Gemini's quota is out
 
     'default_market'     => getenv('DEFAULT_MARKET') ?: 'both',
 

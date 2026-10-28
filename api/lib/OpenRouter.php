@@ -19,6 +19,14 @@ class OpenRouter
         $this->timeout = $timeout;
     }
 
+    /** Free backup client for when Gemini's free quota runs out; null if no OpenRouter key is set. */
+    public static function fallbackFromConfig(array $config): ?self
+    {
+        $key = trim((string) ($config['openrouter_api_key'] ?? ''));
+        if ($key === '' || stripos($key, 'PASTE') !== false) return null;
+        return new self($key, (string) ($config['openrouter_fallback_model'] ?? '') ?: 'nvidia/nemotron-3-ultra-550b-a55b:free,nvidia/nemotron-3.5-super-vl:free,poolside/laguna-s-2.1:free', 90);
+    }
+
     public function message(string $system, $userContent, array $opts = []): string
     {
         $userText = is_array($userContent) ? json_encode($userContent) : (string) $userContent;
@@ -37,8 +45,9 @@ class OpenRouter
 
     private function callOnce(string $system, string $userText, array $opts): string
     {
+        $models = array_values(array_filter(array_map('trim', explode(',', $this->model))));  // "a,b,c" = OpenRouter tries each in turn
         $body = [
-            'model'    => $this->model,
+            'model'    => $models[0] ?? $this->model,
             'messages' => [
                 ['role' => 'system', 'content' => $system],
                 ['role' => 'user',   'content' => $userText],
@@ -47,6 +56,7 @@ class OpenRouter
             'max_tokens'      => $opts['max_tokens'] ?? 6000,
             'temperature'     => 0.6,
         ];
+        if (count($models) > 1) $body['models'] = $models;
         $resp = $this->request($body);
         $content = $resp['choices'][0]['message']['content'] ?? '';
         if (is_array($content)) {

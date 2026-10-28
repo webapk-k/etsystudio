@@ -32,6 +32,8 @@ return [
     // Get a key at https://openrouter.ai -> Keys.  Then set  'provider' => 'openrouter'  above.
     'openrouter_api_key' => 'sk-or-PASTE-YOUR-OPENROUTER-KEY',
     'openrouter_model'   => 'google/gemini-2.0-flash-exp:free',  // free; or paid 'google/gemini-2.5-flash' for max reliability
+    // With provider 'gemini', this key is also a free backup: when Gemini's free quota runs out, requests go here.
+    'openrouter_fallback_model' => 'nvidia/nemotron-3-ultra-550b-a55b:free,nvidia/nemotron-3.5-super-vl:free,poolside/laguna-s-2.1:free',  // comma list: tried in order
 
     /* Default SEO market when the UI does not send one: 'uk', 'us', or 'both' */
     'default_market' => 'both',
